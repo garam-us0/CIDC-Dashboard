@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIDC - Dashboard</title>
+    
+    <!-- Tailwind & Fonts & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- 분리된 CSS 연결 -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
+
+    <!-- 상단 헤더 네비게이션 -->
+    <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-md">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-[14px] font-black tracking-tight text-slate-900 uppercase leading-none">CIDC LOGO</h1>
+                    <span class="bg-blue-50 text-blue-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-blue-200">CAREER & INTERNSHIP CENTER</span>
+                </div>
+                <p class="text-[10px] text-slate-500 font-semibold">Executive Performance & Analytics Platform</p>
+            </div>
+        </div>
+
+        <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <a href="dashboard.html" class="nav-btn active flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-[10px]"></i> Dashboard
+            </a>
+            <a href="data-management.html" class="nav-btn flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-[10px]"></i> Data Management
+            </a>
+            <a href="career-path.html" class="nav-btn flex items-center gap-2">
+                <i class="fa-solid fa-user-graduate text-[10px]"></i> Student Career Path
+            </a>
+        </nav>
+    </header>
+
+    <!-- 대시보드 콘텐츠 영역 -->
+    <main class="flex-grow w-full space-y-4">
+        <!-- 상단 KPI 카드 4개 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="exec-card flex items-center justify-between border-l-4 border-l-blue-600">
+                <div>
+                    <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">TOTAL GRADUATES TRACKED</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-total-graduates" class="text-2xl font-black text-slate-900">1,248</span>
+                    </div>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg border border-blue-100"><i class="fa-solid fa-graduation-cap"></i></div>
+            </div>
+            <!-- ... (나머지 3개 KPI 카드 코드 동일하게 삽입) ... -->
+        </div>
+
+        <!-- 차트 영역 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+            <div class="exec-card h-full bg-white">
+                <h2 class="text-[14px] font-black text-slate-900 leading-snug">Employment & Internship Rate</h2>
+                <div class="relative w-full h-[140px] bg-slate-50 rounded-xl border border-slate-200 p-2 my-2">
+                    <canvas id="chart-employment-cohort"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 분리된 JS 모듈 연결 (순서 중요) -->
+    <script src="js/data/dbState.js"></script>
+    <script src="js/common/utils.js"></script>
+    <script src="js/dashboard/kpi.js"></script>
+    <script src="js/dashboard/chart.js"></script>
+    <script src="js/dashboard/dashboard.js"></script>
+</body>
+</html>
