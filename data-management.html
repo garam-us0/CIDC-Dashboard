@@ -6,31 +6,26 @@
     <title>CIDC - Data Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    
-    <!-- Excel 파싱 라이브러리 -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
 
-    <!-- 헤더 네비게이션 (Data Management 활성화) -->
     <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white"><i class="fa-solid fa-graduation-cap"></i></div>
-            <h1 class="text-[14px] font-black text-slate-900 uppercase leading-none">CIDC LOGO</h1>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h1 class="text-[14px] font-black tracking-tight text-slate-900 uppercase">CIDC LOGO</h1>
         </div>
         <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <a href="dashboard.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-            <a href="data-management.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-table-list"></i> Data Management</a>
-            <a href="career-path.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-user-graduate"></i> Student Career Path</a>
+            <a href="dashboard.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-chart-pie text-[10px]"></i> Dashboard</a>
+            <a href="data-management.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Data Management</a>
+            <a href="career-path.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-user-graduate text-[10px]"></i> Student Career Path</a>
         </nav>
     </header>
 
     <main class="flex-grow w-full space-y-4">
-        <!-- 드래그 앤 드롭 업로드 영역 -->
+        <!-- 엑셀 업로드 영역 -->
         <div class="exec-card border-2 border-dashed border-slate-300 bg-white text-center relative cursor-pointer hover:bg-slate-50 transition-colors">
             <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
             <div class="space-y-2 pointer-events-none">
@@ -39,20 +34,26 @@
             </div>
         </div>
 
-        <!-- 엑셀 데이터 테이블 영역 -->
         <div class="exec-card space-y-4">
+            <div class="flex gap-2">
+                <button onclick="switchExcelSheet('Placement')" id="sheet-btn-Placement" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-blue-600 text-white shadow-sm">Placement Sheet</button>
+            </div>
+            <!-- 업로드 성공 토스트 알림 -->
+            <div id="sync-toast" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-[10px] font-bold flex items-center justify-between shadow-sm mt-3">
+                <span><i class="fa-solid fa-circle-check mr-2 text-emerald-600"></i> 데이터가 성공적으로 업로드/저장되었습니다! 대시보드 탭을 확인하세요.</span>
+            </div>
+            <!-- 엑셀 테이블 -->
             <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[380px]">
                 <table class="w-full text-left text-[10px] text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider sticky top-0 border-b border-slate-200 font-black" id="excel-table-head"></thead>
+                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] sticky top-0 border-b border-slate-200 font-black" id="excel-table-head"></thead>
                     <tbody id="excel-table-body" class="divide-y divide-slate-200 bg-white font-medium"></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- JS 모듈 연결 -->
     <script src="js/data/dbState.js"></script>
-    <script src="js/common/utils.js"></script>
     <script src="js/data/upload.js"></script>
+    <script src="js/dashboard/dashboard.js"></script>
 </body>
 </html>

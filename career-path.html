@@ -3,84 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIDC - Student Career Path</title>
+    <title>CIDC - Career Path</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
 
-    <!-- 상단 헤더 네비게이션 (Career Path 활성화) -->
     <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white"><i class="fa-solid fa-graduation-cap"></i></div>
-            <h1 class="text-[14px] font-black text-slate-900 uppercase leading-none">CIDC LOGO</h1>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h1 class="text-[14px] font-black tracking-tight text-slate-900 uppercase">CIDC LOGO</h1>
         </div>
         <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-            <a href="dashboard.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
-            <a href="data-management.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-table-list"></i> Data Management</a>
-            <a href="career-path.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-user-graduate"></i> Student Career Path</a>
+            <a href="dashboard.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-chart-pie text-[10px]"></i> Dashboard</a>
+            <a href="data-management.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Data Management</a>
+            <a href="career-path.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-user-graduate text-[10px]"></i> Student Career Path</a>
         </nav>
     </header>
 
     <main class="flex-grow w-full space-y-4">
         <div class="exec-card space-y-4">
-            <!-- 검색창 영역 -->
-            <div class="border-b border-slate-200 pb-3 flex justify-between items-center">
-                <div>
-                    <h2 class="text-[14px] font-black text-slate-900">Student Career Path Journey Timeline</h2>
-                    <p class="text-[10px] text-slate-500 font-medium">Track individual student trajectories.</p>
-                </div>
-                <div class="relative w-72">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400"></i>
-                    <input type="text" id="career-search-input" onkeyup="searchCareerPaths()" placeholder="Search Student Name, ID..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-semibold">
-                </div>
-            </div>
+            <h2 class="text-[14px] font-black text-slate-900 border-b border-slate-200 pb-3">Student Career Path Journey Timeline</h2>
 
-            <!-- 개별 학생 로드맵 시각화 영역 -->
             <div class="exec-sub-card border border-slate-200 p-4 space-y-3">
                 <div class="flex justify-between items-center">
                     <div>
-                        <span id="selected-student-name" class="font-black text-slate-900 text-base">Select a student</span>
-                        <span id="selected-student-id" class="text-[10px] font-bold text-slate-500 ml-2"></span>
+                        <span id="selected-student-name" class="font-black text-slate-900 text-base">Select a Student</span>
                     </div>
-                    <span id="selected-student-cohort" class="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-3 py-0.5 rounded-lg">Cohort</span>
+                    <span id="selected-student-cohort" class="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold px-3 py-0.5 rounded-lg">Cohort: -</span>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 py-2 text-[10px]">
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="text-[9px] font-black text-blue-600 uppercase">Step 1: Enrollment</div>
-                        <div id="node-major" class="font-black text-slate-900 mt-1">-</div>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="text-[9px] font-black text-amber-600 uppercase">Step 2: Internship</div>
-                        <div id="node-internship" class="font-black text-slate-900 mt-1">-</div>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="text-[9px] font-black text-teal-600 uppercase">Step 3: OPT Status</div>
-                        <div id="node-opt" class="font-black text-slate-900 mt-1">-</div>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="text-[9px] font-black text-emerald-600 uppercase">Step 4: Placement</div>
-                        <div id="node-employment" class="font-black text-slate-900 mt-1">-</div>
-                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><div class="text-[9px] font-black text-blue-600 uppercase">Step 1: Enrollment</div><div id="node-major" class="font-black text-slate-900 mt-1">-</div></div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><div class="text-[9px] font-black text-amber-600 uppercase">Step 2: Internship</div><div id="node-internship" class="font-black text-slate-900 mt-1">-</div></div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><div class="text-[9px] font-black text-teal-600 uppercase">Step 3: OPT Authorization</div><div id="node-opt" class="font-black text-slate-900 mt-1">-</div></div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><div class="text-[9px] font-black text-emerald-600 uppercase">Step 4: Final Placement</div><div id="node-employment" class="font-black text-slate-900 mt-1">-</div></div>
                 </div>
             </div>
 
-            <!-- 학생 리스트 테이블 -->
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[300px]">
                 <table class="w-full text-left text-[10px] text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider font-black">
-                        <tr>
-                            <th class="p-3">Name</th>
-                            <th class="p-3">Cohort</th>
-                            <th class="p-3">Major</th>
-                            <th class="p-3">Company</th>
-                            <th class="p-3 text-center">Action</th>
-                        </tr>
+                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] sticky top-0 border-b border-slate-200 font-black">
+                        <tr><th class="p-3">Name</th><th class="p-3">Cohort</th><th class="p-3">Major</th><th class="p-3">Company</th><th class="p-3 text-center">Action</th></tr>
                     </thead>
                     <tbody id="career-roster-body" class="divide-y divide-slate-200 bg-white font-medium"></tbody>
                 </table>
@@ -88,9 +53,8 @@
         </div>
     </main>
 
-    <!-- JS 로드 -->
     <script src="js/data/dbState.js"></script>
-    <script src="js/common/utils.js"></script>
     <script src="js/career/career.js"></script>
+    <script src="js/dashboard/dashboard.js"></script>
 </body>
 </html>
