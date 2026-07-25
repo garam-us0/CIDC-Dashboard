@@ -1,25 +1,20 @@
+<!-- 파일 위치: dashboard.html -->
 <!DOCTYPE html>
 <html lang="en" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CIDC - Dashboard</title>
-    
-    <!-- Tailwind & Fonts & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- 분리된 CSS 연결 -->
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
+<body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4 bg-slate-50">
 
-    <!-- 상단 헤더 네비게이션 -->
     <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-md">
@@ -47,38 +42,111 @@
         </nav>
     </header>
 
-    <!-- 대시보드 콘텐츠 영역 -->
     <main class="flex-grow w-full space-y-4">
-        <!-- 상단 KPI 카드 4개 -->
+        
+        <!-- TOP 4 KPI CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="exec-card flex items-center justify-between border-l-4 border-l-blue-600">
                 <div>
                     <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">TOTAL GRADUATES TRACKED</span>
                     <div class="flex items-baseline gap-2">
                         <span id="stat-total-graduates" class="text-2xl font-black text-slate-900">1,248</span>
+                        <span class="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><i class="fa-solid fa-arrow-trend-up text-[10px]"></i> +14.2%</span>
                     </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Class cohorts from 2021 to 2026</p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg border border-blue-100"><i class="fa-solid fa-graduation-cap"></i></div>
             </div>
-            <!-- ... (나머지 3개 KPI 카드 코드 동일하게 삽입) ... -->
+
+            <div class="exec-card flex items-center justify-between border-l-4 border-l-indigo-600">
+                <div>
+                    <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">OVERALL PLACEMENT RATE</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-placement-rate" class="text-2xl font-black text-slate-900">88.5%</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 font-black px-2 py-0.5 rounded-full border border-emerald-200">High</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Full-time employment + Internship</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg border border-indigo-100"><i class="fa-solid fa-briefcase"></i></div>
+            </div>
+
+            <div class="exec-card flex items-center justify-between border-l-4 border-l-teal-600">
+                <div>
+                    <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">STEM / OPT UTILIZATION</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-opt-rate" class="text-2xl font-black text-slate-900">65.0%</span>
+                        <span class="text-[10px] bg-teal-100 text-teal-700 font-black px-2 py-0.5 rounded-full border border-teal-200">Active</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Verified US employment status</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg border border-teal-100"><i class="fa-solid fa-passport"></i></div>
+            </div>
+
+            <div class="exec-card flex items-center justify-between border-l-4 border-l-amber-500">
+                <div>
+                    <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">STUDENT SATISFACTION</span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-slate-900">98.4%</span>
+                        <span class="text-[10px] font-black text-amber-600 flex items-center gap-1"><i class="fa-solid fa-star text-[10px]"></i> 4.9/5.0</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Top rating from 1,400+ surveys</p>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg border border-amber-100"><i class="fa-solid fa-award"></i></div>
+            </div>
         </div>
 
-        <!-- 차트 영역 -->
+        <!-- CHARTS ROW -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-            <div class="exec-card h-full bg-white">
-                <h2 class="text-[14px] font-black text-slate-900 leading-snug">Employment & Internship Rate</h2>
-                <div class="relative w-full h-[140px] bg-slate-50 rounded-xl border border-slate-200 p-2 my-2">
+            <div class="exec-card flex flex-col justify-between h-full bg-white">
+                <div class="flex justify-between items-start pb-1">
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] font-black text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md uppercase tracking-wider">Cohort Analytics</span>
+                        <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">Employment & Internship Rate</h2>
+                    </div>
+                </div>
+                <div class="relative w-full h-[180px] bg-slate-50 rounded-xl border border-slate-200 p-2 my-2 shrink-0">
                     <canvas id="chart-employment-cohort"></canvas>
                 </div>
             </div>
+
+            <div class="exec-card flex flex-col justify-between h-full bg-white">
+                <div class="flex justify-between items-start pb-1">
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] font-black text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-md uppercase tracking-wider">Visa & Placement</span>
+                        <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">OPT-USED Employment Rate</h2>
+                    </div>
+                </div>
+                <div class="flex items-center justify-around relative w-full h-[180px] bg-slate-50 rounded-xl border border-slate-200 p-2 my-2 shrink-0">
+                    <div class="w-32 h-32 relative flex items-center justify-center">
+                        <canvas id="chart-opt-donut"></canvas>
+                    </div>
+                    <div class="w-32 h-32 relative flex items-center justify-center">
+                        <canvas id="chart-emp-donut"></canvas>
+                        <span id="label-emp-yes" class="absolute text-[14px] font-black text-indigo-700">88%</span>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </main>
 
-    <!-- 분리된 JS 모듈 연결 (순서 중요) -->
+    <!-- JS 스크립트 (반드시 순서대로 배치) -->
     <script src="js/data/dbState.js"></script>
-    <script src="js/common/utils.js"></script>
-    <script src="js/dashboard/kpi.js"></script>
     <script src="js/dashboard/chart.js"></script>
-    <script src="js/dashboard/dashboard.js"></script>
+    
+    <script>
+        // 대시보드 페이지 전용 초기화 코드
+        window.onload = function() {
+            if(typeof initDashboardCharts === 'function') initDashboardCharts();
+            
+            // 저장된 placementData를 바탕으로 KPI 숫자 렌더링
+            const gradEl = document.getElementById('stat-total-graduates');
+            if (gradEl && window.dbState) {
+                // 저장된 엑셀 데이터 개수로 UI 즉시 업데이트 (예: 기본 1248 + 엑셀 데이터 길이)
+                const total = window.dbState.placementData.length > 0 ? (1248 + window.dbState.placementData.length) : 1248;
+                gradEl.innerText = total.toLocaleString();
+            }
+        };
+    </script>
 </body>
 </html>
