@@ -7,104 +7,333 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
 
-    <!-- 헤더 (각 HTML 파일로 직접 이동하는 <a> 태그 적용) -->
+    <!-- HEADER -->
     <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black shadow-md"><i class="fa-solid fa-graduation-cap"></i></div>
             <div>
-                <h1 class="text-[14px] font-black tracking-tight text-slate-900 uppercase">CIDC LOGO</h1>
-                <p class="text-[10px] text-slate-500 font-semibold">Executive Performance & Analytics</p>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-[14px] font-black tracking-tight text-slate-900 uppercase leading-none">CIDC LOGO</h1>
+                    <span class="bg-blue-50 text-blue-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-blue-200">CAREER & INTERNSHIP CENTER</span>
+                </div>
+                <p class="text-[10px] text-slate-500 font-semibold">Executive Performance & Analytics Platform</p>
             </div>
         </div>
+
         <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
             <a href="dashboard.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-chart-pie text-[10px]"></i> Dashboard</a>
-            <a href="data-management.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Data Management</a>
+            <a href="data-management.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Excel List</a>
             <a href="career-path.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-user-graduate text-[10px]"></i> Student Career Path</a>
         </nav>
+
+        <div class="hidden xl:flex items-center gap-2 text-[10px] font-bold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+            <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+            <span id="current-timestamp">Live Sync Active</span>
+            <button onclick="recalculateDashboardMetrics()" title="Refresh Dashboard" class="ml-1 text-slate-400 hover:text-slate-700 transition-colors"><i class="fa-solid fa-rotate-right text-[10px]"></i></button>
+        </div>
     </header>
 
     <main class="flex-grow w-full space-y-4">
-        <!-- TOP 4 KPI CARDS -->
+        
+        <!-- 4 KPI CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="exec-card flex items-center justify-between border-l-4 border-l-blue-600">
                 <div>
                     <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">TOTAL GRADUATES TRACKED</span>
-                    <span id="stat-total-graduates" class="text-2xl font-black text-slate-900">1,248</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-total-graduates" class="text-2xl font-black text-slate-900">1,248</span>
+                        <span class="text-[10px] font-bold text-emerald-600 flex items-center gap-0.5"><i class="fa-solid fa-arrow-trend-up text-[10px]"></i> +14.2%</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Class cohorts from 2021 to 2026</p>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-graduation-cap"></i></div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg border border-blue-100"><i class="fa-solid fa-graduation-cap"></i></div>
             </div>
+
             <div class="exec-card flex items-center justify-between border-l-4 border-l-indigo-600">
                 <div>
                     <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">OVERALL PLACEMENT RATE</span>
-                    <span id="stat-placement-rate" class="text-2xl font-black text-slate-900">88.5%</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-placement-rate" class="text-2xl font-black text-slate-900">88.5%</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-700 font-black px-2 py-0.5 rounded-full border border-emerald-200">High</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Full-time employment + Internship</p>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-briefcase"></i></div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg border border-indigo-100"><i class="fa-solid fa-briefcase"></i></div>
             </div>
+
             <div class="exec-card flex items-center justify-between border-l-4 border-l-teal-600">
                 <div>
                     <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">STEM / OPT UTILIZATION</span>
-                    <span id="stat-opt-rate" class="text-2xl font-black text-slate-900">65.0%</span>
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-opt-rate" class="text-2xl font-black text-slate-900">65.0%</span>
+                        <span class="text-[10px] bg-teal-100 text-teal-700 font-black px-2 py-0.5 rounded-full border border-teal-200">Active</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Verified US employment status</p>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg"><i class="fa-solid fa-passport"></i></div>
+                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg border border-teal-100"><i class="fa-solid fa-passport"></i></div>
             </div>
+
             <div class="exec-card flex items-center justify-between border-l-4 border-l-amber-500">
                 <div>
                     <span class="text-[10px] font-black tracking-wider text-slate-500 uppercase block mb-1">STUDENT SATISFACTION</span>
-                    <span class="text-2xl font-black text-slate-900">98.4%</span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-2xl font-black text-slate-900">98.4%</span>
+                        <span class="text-[10px] font-black text-amber-600 flex items-center gap-1"><i class="fa-solid fa-star text-[10px]"></i> 4.9/5.0</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-semibold mt-1">Top rating from 1,400+ surveys</p>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-award"></i></div>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg border border-amber-100"><i class="fa-solid fa-award"></i></div>
             </div>
         </div>
 
         <!-- CHARTS ROW -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
             <div class="exec-card flex flex-col justify-between h-full bg-white">
-                <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">Employment & Internship Rate</h2>
+                <div class="flex justify-between items-start pb-1">
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] font-black text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md uppercase tracking-wider">Cohort Analytics</span>
+                        <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">Employment & Internship Rate</h2>
+                    </div>
+                    <div class="flex items-center gap-4 text-[10px] font-extrabold mt-1">
+                        <span class="flex items-center gap-1.5 text-blue-600"><span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> Full-time</span>
+                        <span class="flex items-center gap-1.5 text-amber-600"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Internship</span>
+                    </div>
+                </div>
                 <div class="compact-chart-container relative w-full bg-slate-50 rounded-xl border border-slate-200 p-2 my-1 shrink-0">
                     <canvas id="chart-employment-cohort"></canvas>
                 </div>
-                <div class="pt-3 mt-auto"><div class="grid grid-cols-4 sm:grid-cols-8 gap-2.5" id="company-logos-grid"></div></div>
+                <div class="pt-3 border-t-2 border-slate-200 mt-auto flex-grow flex flex-col justify-center space-y-2.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[14px] font-black text-slate-900">Top Alumni Employer Destinations</span>
+                        <span class="text-blue-600 text-[10px] font-bold">50+ Global Corporations</span>
+                    </div>
+                    <div class="grid grid-cols-4 sm:grid-cols-8 gap-2.5" id="company-logos-grid"></div>
+                </div>
             </div>
 
             <div class="exec-card flex flex-col justify-between h-full bg-white">
-                <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">OPT-USED Employment Rate</h2>
-                <div class="flex items-center justify-around relative w-full h-[180px] bg-slate-50 rounded-xl border border-slate-200 p-2 my-2 shrink-0">
-                    <div class="w-32 h-32 relative flex items-center justify-center"><canvas id="chart-opt-donut"></canvas></div>
-                    <div class="w-32 h-32 relative flex items-center justify-center">
-                        <canvas id="chart-emp-donut"></canvas>
-                        <span id="label-emp-yes" class="absolute text-[14px] font-black text-indigo-700">88%</span>
+                <div class="flex justify-between items-start pb-1">
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] font-black text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-md uppercase tracking-wider">Visa & Placement</span>
+                        <h2 class="text-[14px] font-black text-slate-900 mt-2 leading-snug">OPT-USED Employment Rate</h2>
+                    </div>
+                </div>
+                <div class="compact-chart-container relative w-full bg-slate-50 rounded-xl border border-slate-200 p-2 my-1 shrink-0">
+                    <canvas id="chart-opt-cohort"></canvas>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 h-[150px] w-full mt-auto">
+                    <div class="sm:col-span-4 flex flex-col gap-2.5 h-full">
+                        <div class="flex-1 bg-white border border-slate-200 rounded-2xl p-2.5 flex flex-col justify-center shadow-sm">
+                            <span class="text-[10px] font-bold text-[#66748A] mb-1.5">Previous Years</span>
+                            <div class="relative w-full">
+                                <select id="select-cohort-filter" onchange="selectCohortFilter(this.value)" class="w-full bg-white border border-slate-300 text-slate-800 text-[10px] font-bold rounded-xl h-[38px] px-2.5 outline-none appearance-none cursor-pointer focus:border-teal-500">
+                                    <option value="All Cohorts">All Cohorts</option>
+                                    <option value="Spring 2021">Spring 2021</option>
+                                    <option value="Summer 2021">Summer 2021</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-white border border-slate-200 rounded-2xl p-2.5 flex flex-col justify-center shadow-sm">
+                            <span class="text-[10px] font-bold text-[#66748A] mb-1.5">Current Cohort</span>
+                            <button onclick="resetToCurrentCohort()" class="w-full bg-[#f0fdfa] hover:bg-teal-50 border-2 border-[#2dd4bf] text-teal-800 text-[10px] font-extrabold rounded-xl h-[38px] flex items-center justify-center gap-1.5 transition-colors active:scale-95 shadow-sm">
+                                <i class="fa-solid fa-rotate-left"></i> Spring 2026
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-8 bg-white border border-slate-200 rounded-2xl p-2.5 flex items-center shadow-sm h-full relative">
+                        <div class="w-1/2 h-full flex flex-col items-center justify-between py-1">
+                            <span class="text-[9px] font-black text-white bg-[#1e293b] px-2.5 py-1 rounded-md uppercase tracking-wider">OPT USED</span>
+                            <div class="w-16 h-16 relative flex items-center justify-center my-auto">
+                                <canvas id="chart-opt-donut"></canvas>
+                                <span class="absolute text-[8px] font-black text-slate-700">No Yes</span>
+                            </div>
+                            <span id="label-opt-yes" class="text-[12px] font-extrabold text-[#0d9488]">65% Yes</span>
+                        </div>
+
+                        <div class="w-1/2 h-full bg-[#f0fdf9] border-2 border-[#00be81] rounded-2xl flex flex-col items-center justify-between py-2 relative shadow-sm">
+                            <div class="absolute top-1/2 -left-[14px] -translate-y-1/2 w-0 h-0 border-y-[12px] border-y-transparent border-r-[14px] border-r-[#00be81] z-10"></div>
+                            <div class="absolute top-1/2 -left-[10px] -translate-y-1/2 w-0 h-0 border-y-[10px] border-y-transparent border-r-[11px] border-r-[#f0fdf9] z-20"></div>
+
+                            <span class="text-[9px] font-black text-white bg-[#1e293b] px-2.5 py-1 rounded-md uppercase tracking-wider">EMPLOYMENT</span>
+                            <div class="w-16 h-16 relative flex items-center justify-center my-auto">
+                                <canvas id="chart-emp-donut"></canvas>
+                                <span class="absolute text-[8px] font-black text-slate-700">No Yes</span>
+                            </div>
+                            <div class="w-full flex justify-end px-2">
+                                <span id="label-emp-yes" class="text-[12px] font-extrabold text-indigo-700 leading-none">88% Yes</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- BOTTOM EVENT SHOWCASE -->
-        <div class="exec-card flex flex-col justify-between space-y-3.5">
-            <h2 class="text-[14px] font-black text-slate-900">Event Showcase</h2>
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
-                <div class="md:col-span-4 exec-sub-card p-2 space-y-1.5 overflow-y-auto max-h-[250px]" id="event-items-list"></div>
-                <div class="md:col-span-8 exec-sub-card p-3 flex flex-col justify-between">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 id="event-photo-title" class="text-[12px] font-black text-slate-900"></h3>
-                        <div class="flex gap-1.5">
-                            <button onclick="prevEvent()" class="w-6 h-6 rounded bg-slate-200"><i class="fa-solid fa-chevron-left"></i></button>
-                            <button onclick="nextEvent()" class="w-6 h-6 rounded bg-slate-200"><i class="fa-solid fa-chevron-right"></i></button>
+        <!-- BOTTOM ROW -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div class="lg:col-span-3 exec-card flex flex-col justify-between space-y-3.5">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <h2 class="text-[14px] font-black text-slate-900">Satisfaction & Consultation</h2>
+                    </div>
+                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold px-2 py-0.5 rounded">STATS</span>
+                </div>
+
+                <div class="exec-sub-card p-3 space-y-2.5 border border-slate-200">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[9px] font-black text-slate-500 uppercase mb-1">YEAR</label>
+                            <select id="select-consult-year" onchange="recalculateConsultationCount()" class="w-full bg-white border border-slate-300 text-slate-800 text-[10px] font-bold rounded-lg p-1.5 shadow-sm">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-black text-slate-500 uppercase mb-1">SEASON</label>
+                            <select id="select-consult-season" onchange="recalculateConsultationCount()" class="w-full bg-white border border-slate-300 text-slate-800 text-[10px] font-bold rounded-lg p-1.5 shadow-sm">
+                                <option value="Spring">Spring</option>
+                                <option value="Summer">Summer</option>
+                                <option value="Fall">Fall</option>
+                            </select>
                         </div>
                     </div>
-                    <img id="event-photo-img" src="" class="rounded-xl overflow-hidden h-44 w-full object-cover">
-                    <p id="event-desc-text" class="text-[10px] text-slate-700 font-semibold italic mt-2"></p>
+                    <div class="bg-slate-100/80 p-2 rounded-xl border border-slate-200 text-center mt-1">
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-wide block">(THE SEASON'S TOTAL CONSULTATION NUMBER)</span>
+                        <span id="stat-consultation-count" class="text-lg font-black text-blue-600 block mt-0.5">1,420 Sessions</span>
+                    </div>
                 </div>
+
+                <div class="exec-sub-card p-3 flex flex-col items-center justify-center text-center border border-slate-200">
+                    <div class="w-28 h-14 relative"><canvas id="chart-satisfaction-gauge"></canvas></div>
+                    <div class="text-xl font-black text-slate-900 mt-1">98%</div>
+                    <span class="text-[10px] font-black text-emerald-600 flex items-center justify-center gap-1 mt-0.5">
+                        <i class="fa-solid fa-star text-amber-500 text-[10px]"></i> 4–5 Star Proportion
+                    </span>
+                </div>
+
+                <div class="exec-sub-card p-3 border border-slate-200 space-y-1.5">
+                    <div class="flex justify-between items-center text-[10px] font-black text-amber-600 uppercase tracking-wider">
+                        <span><i class="fa-solid fa-quote-left mr-1"></i> REVIEW</span>
+                        <div class="flex gap-1">
+                            <button onclick="prevFeedback()" class="w-5 h-5 rounded bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-[10px]"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button onclick="nextFeedback()" class="w-5 h-5 rounded bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-[10px]"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <p id="feedback-text-container" class="text-[10px] italic text-slate-700 font-medium leading-snug"></p>
+                    <div class="flex justify-center gap-1.5 pt-1" id="feedback-dots"></div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-9 exec-card flex flex-col justify-between space-y-3.5">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                        <h2 class="text-[14px] font-black text-slate-900">Event Showcase & Analytics</h2>
+                    </div>
+                    <span class="bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-extrabold px-2 py-0.5 rounded">STATS</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="md:col-span-3 exec-sub-card border border-slate-200 flex flex-col justify-between overflow-hidden">
+                        <div class="bg-slate-100 px-3 py-2.5 border-b border-slate-200 flex justify-between items-center text-[10px] font-black text-slate-800">
+                            <span>Event List</span>
+                            <span class="bg-blue-600 text-white px-2.5 py-0.5 rounded-full text-[10px]" id="badge-event-count">TOTAL : 4</span>
+                        </div>
+                        <div class="overflow-y-auto max-h-[250px] p-2 space-y-1.5" id="event-items-list"></div>
+                    </div>
+
+                    <div class="md:col-span-5 exec-sub-card border border-slate-200 p-3 flex flex-col justify-between space-y-3">
+                        <div class="flex justify-between items-center bg-slate-100 px-3 py-2 rounded-lg border border-slate-200">
+                            <span class="bg-slate-200 text-slate-700 border border-slate-300 font-extrabold text-[10px] px-2.5 py-0.5 rounded-md uppercase tracking-wider">Photo</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="prevEvent()" class="w-6 h-6 rounded bg-slate-200 hover:bg-blue-600 hover:text-white flex items-center justify-center text-[10px] shadow-sm"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button onclick="nextEvent()" class="w-6 h-6 rounded bg-slate-200 hover:bg-blue-600 hover:text-white flex items-center justify-center text-[10px] shadow-sm"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center gap-3">
+                            <div class="bg-slate-100 px-3 py-2 rounded-lg border border-slate-200 flex-grow min-w-0">
+                                <h3 id="event-photo-title" class="text-[12px] font-black text-slate-900 truncate"></h3>
+                            </div>
+                            <div class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-right shrink-0 flex flex-col justify-center">
+                                <span id="event-date-text" class="text-[10px] font-sans font-extrabold text-slate-500 block leading-tight"></span>
+                                <span id="event-attendance-text" class="text-[10px] font-black text-emerald-700 leading-tight"></span>
+                            </div>
+                        </div>
+
+                        <div class="relative rounded-xl overflow-hidden h-44 bg-slate-900 border border-slate-300 shadow-sm group">
+                            <img id="event-photo-img" src="" alt="Event" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                            <p id="event-desc-text" class="text-[10px] text-slate-700 font-semibold italic truncate"></p>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-4 exec-sub-card border border-slate-200 p-3 flex flex-col justify-between">
+                        <div class="border-b border-slate-200 pb-2 flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-800">Event Info</span>
+                            <span class="text-[9px] font-bold text-slate-400">By Category & Year</span>
+                        </div>
+                        <div class="relative w-full h-[200px] bg-white p-1.5 rounded-lg flex items-center">
+                            <canvas id="chart-event-info"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="exec-card border border-slate-200 bg-white shadow-sm mt-2">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <button onclick="openSheetModal('Placement')" class="action-sheet-btn py-2.5 text-[10px] bg-slate-50 border-slate-200 hover:border-blue-500 hover:bg-blue-50/50">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-table-cells text-blue-600"></i> Placement Sheet</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] opacity-60"></i>
+                </button>
+                <button onclick="openSheetModal('OPT')" class="action-sheet-btn py-2.5 text-[10px] bg-slate-50 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-id-card text-teal-600"></i> OPT Sheet</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] opacity-60"></i>
+                </button>
+                <button onclick="openSheetModal('Consultation')" class="action-sheet-btn py-2.5 text-[10px] bg-slate-50 border-slate-200 hover:border-amber-500 hover:bg-amber-50/50">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-comments text-amber-600"></i> Consultation</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] opacity-60"></i>
+                </button>
+                <button onclick="openSheetModal('Event')" class="action-sheet-btn py-2.5 text-[10px] bg-slate-50 border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-check text-emerald-600"></i> Event & Budget</span>
+                    <i class="fa-solid fa-arrow-right text-[10px] opacity-60"></i>
+                </button>
             </div>
         </div>
     </main>
 
-    <!-- 스크립트 연결 (순서 엄수) -->
+    <!-- 모달 -->
+    <div id="sheet-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden">
+            <div class="p-4 bg-slate-100 border-b border-slate-200 text-slate-900 flex justify-between items-center">
+                <h3 id="modal-sheet-title" class="font-black text-[10px] text-slate-900 flex items-center gap-2 uppercase tracking-wider"><i class="fa-solid fa-table text-blue-600"></i> Sheet View</h3>
+                <button onclick="closeSheetModal()" class="text-slate-400 hover:text-slate-800 font-black text-xl">&times;</button>
+            </div>
+            <div class="p-4 flex-grow overflow-y-auto" id="modal-sheet-content"></div>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <span class="text-[10px] text-slate-500 font-semibold">Press Close or click outside to dismiss</span>
+                <button onclick="goToExcelTabFromModal()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] rounded-xl shadow-md">Edit Data in Excel Tab</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 연결 (데이터 -> 공통 -> 뷰 순서 엄수) -->
     <script src="js/data/dbState.js"></script>
+    <script src="js/common/utils.js"></script>
+    <script src="js/common/modal.js"></script>
+    <script src="js/data/upload.js"></script>
+    <script src="js/dashboard/kpi.js"></script>
+    <script src="js/dashboard/chart.js"></script>
     <script src="js/dashboard/eventCard.js"></script>
     <script src="js/dashboard/dashboard.js"></script>
 </body>

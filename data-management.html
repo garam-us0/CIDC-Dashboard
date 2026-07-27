@@ -12,6 +12,7 @@
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6 space-y-4">
 
+    <!-- HEADER -->
     <header class="w-full bg-white border border-slate-200 rounded-2xl p-[20px] flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg font-black"><i class="fa-solid fa-graduation-cap"></i></div>
@@ -19,41 +20,90 @@
         </div>
         <nav class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
             <a href="dashboard.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-chart-pie text-[10px]"></i> Dashboard</a>
-            <a href="data-management.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Data Management</a>
+            <a href="data-management.html" class="nav-btn active flex items-center gap-2"><i class="fa-solid fa-table-list text-[10px]"></i> Excel List</a>
             <a href="career-path.html" class="nav-btn flex items-center gap-2"><i class="fa-solid fa-user-graduate text-[10px]"></i> Student Career Path</a>
         </nav>
+        <div class="hidden xl:flex items-center gap-2 text-[10px] font-bold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+            <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+            <span id="current-timestamp">Live Sync Active</span>
+        </div>
     </header>
 
     <main class="flex-grow w-full space-y-4">
-        <!-- 엑셀 업로드 영역 -->
+        <!-- 엑셀 드래그앤드롭 -->
         <div class="exec-card border-2 border-dashed border-slate-300 bg-white text-center relative cursor-pointer hover:bg-slate-50 transition-colors">
             <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
             <div class="space-y-2 pointer-events-none">
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto text-xl border border-emerald-200"><i class="fa-solid fa-file-excel"></i></div>
                 <h3 class="text-[14px] font-black text-slate-900">Drag & Drop your Excel (`.xlsx`, `.csv`) File Here</h3>
+                <p class="text-[10px] text-slate-500 font-medium">Uploaded spreadsheet records will instantly recalculate all dashboard graphs.</p>
             </div>
         </div>
 
+        <!-- 데이터 테이블 -->
         <div class="exec-card space-y-4">
-            <div class="flex gap-2">
-                <button onclick="switchExcelSheet('Placement')" id="sheet-btn-Placement" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-blue-600 text-white shadow-sm">Placement Sheet</button>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 border-b border-slate-200 pb-3">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="switchExcelSheet('Placement')" id="sheet-btn-Placement" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-blue-600 text-white shadow-sm">Placement Sheet (<span id="count-sheet-placement">0</span>)</button>
+                    <button onclick="switchExcelSheet('OPT')" id="sheet-btn-OPT" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-slate-100 text-slate-700 hover:bg-slate-200">OPT Sheet (<span id="count-sheet-opt">0</span>)</button>
+                    <button onclick="switchExcelSheet('Consultation')" id="sheet-btn-Consultation" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-slate-100 text-slate-700 hover:bg-slate-200">Consultation Sheet (<span id="count-sheet-consultation">0</span>)</button>
+                    <button onclick="switchExcelSheet('Event')" id="sheet-btn-Event" class="px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-slate-100 text-slate-700 hover:bg-slate-200">Event & Budget Sheet (<span id="count-sheet-event">0</span>)</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="addNewRowModal()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] rounded-lg shadow-sm"><i class="fa-solid fa-plus"></i> Add Record</button>
+                    <button onclick="exportCurrentSheetToCSV()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[10px] rounded-lg border border-slate-300"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+                </div>
             </div>
-            <!-- 업로드 성공 토스트 알림 -->
-            <div id="sync-toast" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-[10px] font-bold flex items-center justify-between shadow-sm mt-3">
-                <span><i class="fa-solid fa-circle-check mr-2 text-emerald-600"></i> 데이터가 성공적으로 업로드/저장되었습니다! 대시보드 탭을 확인하세요.</span>
+
+            <div class="flex justify-between items-center gap-4 text-[10px]">
+                <div class="relative w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-slate-400"></i>
+                    <input type="text" id="excel-search-input" onkeyup="filterExcelTable()" placeholder="Search active sheet records..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 text-[10px] font-semibold">
+                </div>
+                <span id="table-row-info" class="text-slate-500 font-bold text-[10px]">Showing total rows</span>
             </div>
-            <!-- 엑셀 테이블 -->
+
             <div class="overflow-x-auto border border-slate-200 rounded-xl max-h-[380px]">
                 <table class="w-full text-left text-[10px] text-slate-700">
-                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] sticky top-0 border-b border-slate-200 font-black" id="excel-table-head"></thead>
+                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider sticky top-0 border-b border-slate-200 font-black" id="excel-table-head"></thead>
                     <tbody id="excel-table-body" class="divide-y divide-slate-200 bg-white font-medium"></tbody>
                 </table>
+            </div>
+
+            <div id="sync-toast" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 p-3 rounded-xl text-[10px] font-bold flex items-center justify-between shadow-sm mt-3">
+                <span><i class="fa-solid fa-circle-check mr-2 text-emerald-600"></i> Data successfully updated and synced!</span>
+                <button onclick="document.getElementById('sync-toast').classList.add('hidden')" class="text-emerald-700 font-black">&times;</button>
             </div>
         </div>
     </main>
 
+    <!-- 모달 -->
+    <div id="add-row-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-2xl w-full max-w-md p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-black text-slate-900 text-[10px] flex items-center gap-2 uppercase tracking-wider"><i class="fa-solid fa-plus-circle text-emerald-600"></i> Add New Record</h3>
+                <button onclick="closeAddRowModal()" class="text-slate-400 hover:text-slate-800 font-black text-lg">&times;</button>
+            </div>
+            <form id="add-row-form" onsubmit="submitNewRecord(event)" class="space-y-3 text-[10px]">
+                <div id="add-row-inputs" class="space-y-3 max-h-[280px] overflow-y-auto pr-1"></div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+                    <button type="button" onclick="closeAddRowModal()" class="px-4 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-md">Save Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 스크립트 연결 -->
     <script src="js/data/dbState.js"></script>
+    <script src="js/common/utils.js"></script>
+    <script src="js/common/modal.js"></script>
     <script src="js/data/upload.js"></script>
-    <script src="js/dashboard/dashboard.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof updateTabCounts === 'function') updateTabCounts();
+            if (typeof renderExcelTable === 'function') renderExcelTable();
+        });
+    </script>
 </body>
 </html>

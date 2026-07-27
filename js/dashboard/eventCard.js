@@ -6,6 +6,9 @@ function renderEventList() {
             <span class="truncate w-full">${evt.title}</span>
         </div>
     `).join('');
+    
+    const badge = document.getElementById('badge-event-count');
+    if (badge) badge.innerText = `TOTAL : ${window.dbState.eventData.length}`;
 }
 
 function selectEvent(idx) { window.dbState.currentEventIdx = idx; renderEventList(); renderCurrentEvent(); }
@@ -18,6 +21,8 @@ function renderCurrentEvent() {
         if(document.getElementById('event-photo-img')) document.getElementById('event-photo-img').src = evt.photo;
         if(document.getElementById('event-photo-title')) document.getElementById('event-photo-title').innerText = evt.title;
         if(document.getElementById('event-desc-text')) document.getElementById('event-desc-text').innerText = `"${evt.desc}"`;
+        if(document.getElementById('event-attendance-text')) document.getElementById('event-attendance-text').innerText = `${evt.attendance} Students`;
+        if(document.getElementById('event-date-text')) document.getElementById('event-date-text').innerText = evt.date;
     }
 }
 
@@ -31,5 +36,6 @@ function updateFeedbackDisplay() {
         ).join('');
     }
 }
+
 function prevFeedback() { window.dbState.currentFeedbackIdx = (window.dbState.currentFeedbackIdx - 1 + window.dbState.feedbackList.length) % window.dbState.feedbackList.length; updateFeedbackDisplay(); }
 function nextFeedback() { window.dbState.currentFeedbackIdx = (window.dbState.currentFeedbackIdx + 1) % window.dbState.feedbackList.length; updateFeedbackDisplay(); }
