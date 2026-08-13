@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIDC Dashboard — Preview</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{
+  color-scheme: light;
+  --font-main:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;
+  --bg-canvas:#f8fafc; --card-bg:#ffffff; --card-sub-bg:#f8fafc; --card-border:#e2e8f0;
+  --blue:#2563eb; --blue-l:#eff6ff; --indigo:#4f46e5; --indigo-l:#eef2ff;
+  --teal:#0d9488; --teal-l:#f0fdfa; --amber:#d97706; --amber-l:#fffbeb;
+  --emerald:#10b981; --emerald-l:#ecfdf5; --rose:#e11d48; --rose-l:#fff1f2;
+  --slate-900:#0f172a; --slate-700:#334155; --slate-500:#64748b; --slate-400:#94a3b8; --slate-300:#cbd5e1; --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--font-main);background:var(--bg-canvas);color:var(--slate-900);padding:16px;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:16px;}
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.03);padding:18px;}
+.subcard{background:var(--card-sub-bg);border:1px solid var(--card-border);border-radius:16px;}
+h1,h2,h3,p{margin:0;}
+.badge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:999px;border:1px solid;}
+button{font-family:inherit;cursor:pointer;}
+select{font-family:inherit;}
+
+/* HEADER */
+.header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#4f46e5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px;}
+.brand-title{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.02em;}
+.brand-tag{font-size:9px;font-weight:800;background:var(--blue-l);color:var(--blue);border:1px solid #bfdbfe;padding:2px 8px;border-radius:999px;margin-left:6px;}
+.brand-sub{font-size:10px;color:var(--slate-500);font-weight:600;}
+.nav{display:flex;background:var(--slate-100);border:1px solid var(--card-border);border-radius:12px;padding:4px;gap:2px;}
+.nav-btn{border:none;background:transparent;color:var(--slate-500);font-weight:700;font-size:10px;padding:8px 16px;border-radius:9px;transition:.15s;}
+.nav-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+.live{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;color:var(--slate-700);background:var(--slate-50);border:1px solid var(--card-border);padding:7px 12px;border-radius:12px;}
+.dot{width:9px;height:9px;border-radius:99px;background:#10b981;position:relative;}
+.dot::after{content:'';position:absolute;inset:0;border-radius:99px;background:#10b981;opacity:.6;animation:ping 1.6s infinite;}
+@keyframes ping{75%,100%{transform:scale(2.2);opacity:0;}}
+.refresh-btn{border:none;background:transparent;color:var(--slate-400);font-size:12px;}
+.refresh-btn:hover{color:var(--slate-700);}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:1000px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.kpi{border-left:4px solid var(--blue);display:flex;justify-content:space-between;align-items:center;}
+.kpi .lbl{font-size:9px;font-weight:900;letter-spacing:.04em;color:var(--slate-500);text-transform:uppercase;display:block;margin-bottom:4px;}
+.kpi .val{font-size:22px;font-weight:900;}
+.kpi .sub{font-size:9px;color:var(--slate-400);font-weight:700;margin-top:4px;}
+.kpi .icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid;}
+
+/* GRID ROWS */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
+@media(max-width:1000px){.row2{grid-template-columns:1fr;}}
+.chart-box{position:relative;width:100%;height:130px;background:var(--slate-50);border:1px solid var(--card-border);border-radius:12px;padding:8px;margin:8px 0;}
+.section-tag{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:8px;border:1px solid;}
+.legend{display:flex;gap:14px;font-size:10px;font-weight:800;}
+.legend span{display:flex;align-items:center;gap:5px;}
+.dotc{width:9px;height:9px;border-radius:99px;}
+
+/* company logos */
+.logo-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;}
+@media(max-width:700px){.logo-grid{grid-template-columns:repeat(4,1fr);}}
+.logo-card{padding:8px 4px;text-align:center;cursor:pointer;transition:.15s;border-radius:14px;}
+.logo-card:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.08);}
+.logo-badge{width:34px;height:34px;border-radius:10px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:11px;}
+.logo-count{font-size:11px;font-weight:900;color:var(--slate-800,#1e293b);}
+
+/* opt row */
+.opt-row{display:grid;grid-template-columns:1fr 2fr;gap:10px;height:150px;margin-top:auto;}
+@media(max-width:640px){.opt-row{grid-template-columns:1fr;height:auto;}}
+.opt-left{display:flex;flex-direction:column;gap:8px;}
+.opt-left .subcard{flex:1;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.opt-left label{font-size:9px;font-weight:700;color:#66748A;margin-bottom:5px;}
+.sel-wrap{position:relative;}
+.sel-wrap select{width:100%;background:#fff;border:1px solid var(--slate-300);color:var(--slate-900);font-size:10px;font-weight:700;border-radius:10px;height:34px;padding:0 10px;appearance:none;outline:none;}
+.sel-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--slate-400);pointer-events:none;}
+.reset-btn{width:100%;background:#f0fdfa;border:2px solid #2dd4bf;color:#115e59;font-size:10px;font-weight:800;border-radius:10px;height:34px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.reset-btn:hover{background:#ccfbf1;}
+.donut-panel{background:#fff;border:1px solid var(--card-border);border-radius:16px;display:flex;align-items:center;padding:6px;position:relative;}
+.donut-half{width:50%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 2px;}
+.donut-half.emp{background:#f0fdf9;border:2px solid #00be81;border-radius:14px;position:relative;}
+.donut-tag{font-size:8px;font-weight:900;color:#fff;background:#1e293b;padding:3px 9px;border-radius:7px;text-transform:uppercase;letter-spacing:.03em;}
+.donut-canvas-wrap{width:58px;height:58px;position:relative;cursor:pointer;}
+.donut-canvas-wrap span.center-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;color:var(--slate-700);pointer-events:none;}
+.donut-result{font-size:11px;font-weight:900;}
+
+/* bottom row */
+.row-bottom{display:grid;grid-template-columns:3fr 9fr;gap:14px;}
+@media(max-width:1000px){.row-bottom{grid-template-columns:1fr;}}
+.card-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--card-border);padding-bottom:10px;margin-bottom:10px;}
+.card-head h2{font-size:13px;font-weight:900;display:flex;align-items:center;gap:7px;}
+.dot-sm{width:9px;height:9px;border-radius:99px;}
+
+.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.consult-box{background:rgba(241,245,249,.8);border:1px solid var(--card-border);border-radius:12px;padding:8px;text-align:center;margin-top:6px;}
+.consult-box .cnt{font-size:16px;font-weight:900;color:var(--blue);display:block;margin-top:2px;}
+.gauge-wrap{text-align:center;padding:10px 0;}
+.gauge-canvas{width:110px;height:56px;margin:0 auto;}
+.review-box{padding:10px;}
+.review-head{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:900;color:var(--amber);text-transform:uppercase;}
+.nav-mini{width:20px;height:20px;border-radius:6px;background:var(--slate-200);border:none;font-size:9px;display:inline-flex;align-items:center;justify-content:center;}
+.nav-mini:hover{background:var(--slate-300);}
+.dots{display:flex;justify-content:center;gap:5px;margin-top:6px;}
+.dots span{width:6px;height:6px;border-radius:99px;background:var(--slate-300);}
+.dots span.on{background:var(--blue);}
+
+/* events */
+.event-shell{border:1px solid var(--card-border);border-radius:16px;display:grid;grid-template-columns:3fr 5fr 4fr;overflow:hidden;flex-grow:1;background:#fff;}
+@media(max-width:900px){.event-shell{grid-template-columns:1fr;}}
+.event-col{padding:0;display:flex;flex-direction:column;border-right:1px solid var(--card-border);}
+.event-col:last-child{border-right:none;}
+.event-col-head{background:var(--slate-100);padding:9px 12px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:900;}
+.count-pill{background:var(--blue);color:#fff;padding:2px 9px;border-radius:99px;font-size:10px;}
+.event-list{overflow-y:auto;max-height:250px;padding:6px;}
+.event-item{padding:9px;border-radius:9px;font-size:10px;font-weight:700;cursor:pointer;margin-bottom:3px;color:var(--slate-600);}
+.event-item:hover{background:var(--slate-100);}
+.event-item.on{background:#dbeafe;border:1px solid #93c5fd;color:#1e3a8a;}
+.photo-inner{padding:10px;display:flex;flex-direction:column;gap:9px;flex:1;}
+.photo-topbar{display:flex;justify-content:space-between;align-items:center;background:var(--slate-100);padding:7px 10px;border-radius:8px;}
+.photo-title-row{display:flex;justify-content:space-between;gap:8px;align-items:center;}
+.photo-title-box{background:var(--slate-100);padding:7px 10px;border-radius:8px;flex:1;min-width:0;}
+.photo-title-box h3{font-size:11px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.photo-meta{background:var(--emerald-l);border:1px solid #a7f3d0;padding:5px 10px;border-radius:10px;text-align:right;flex-shrink:0;}
+.photo-meta .d{font-size:9px;font-weight:800;color:var(--slate-500);}
+.photo-meta .a{font-size:10px;font-weight:900;color:#047857;}
+.photo-frame{border-radius:10px;overflow:hidden;height:150px;background:#0f172a;border:1px solid var(--slate-300);}
+.photo-frame img{width:100%;height:100%;object-fit:cover;}
+.photo-frame.blank{display:flex;align-items:center;justify-content:center;color:var(--slate-500);font-size:10px;font-weight:700;background:var(--slate-100);}
+.photo-desc{background:var(--slate-50);padding:8px 10px;border-radius:8px;font-size:10px;color:var(--slate-700);font-weight:600;font-style:italic;}
+.info-inner{padding:10px;display:flex;flex-direction:column;flex:1;}
+.info-head{display:flex;justify-content:space-between;border-bottom:1px solid var(--card-border);padding-bottom:8px;margin-bottom:8px;font-size:10px;font-weight:900;}
+.info-chart{position:relative;height:200px;flex:1;}
+
+/* sheet buttons row */
+.sheet-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:700px){.sheet-links{grid-template-columns:1fr 1fr;}}
+.sheet-link-btn{background:var(--slate-50);border:1px solid var(--card-border);border-radius:12px;padding:10px 12px;font-size:10px;font-weight:800;display:flex;justify-content:space-between;align-items:center;transition:.15s;}
+.sheet-link-btn:hover{border-color:var(--blue);background:var(--blue-l);color:var(--blue);transform:translateY(-2px);}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;}
+.modal-bg.show{display:flex;}
+.modal-box{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:640px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-box.wide{max-width:1080px;}
+.error-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:300;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 14px;border-radius:12px;font-size:11px;font-weight:800;display:none;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(15,23,42,.18);max-width:560px;}
+.modal-head{padding:14px 16px;background:var(--slate-100);border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center;}
+.modal-head h3{font-size:11px;font-weight:900;text-transform:uppercase;}
+.modal-close{background:none;border:none;font-size:20px;color:var(--slate-400);font-weight:900;line-height:1;}
+.modal-body{padding:16px;overflow-y:auto;font-size:10px;}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.modal-stat{background:var(--slate-50);border:1px solid var(--card-border);border-radius:10px;padding:8px;text-align:center;}
+.modal-stat b{display:block;font-size:15px;color:var(--blue);}
+table.mini{width:100%;border-collapse:collapse;font-size:10px;}
+table.mini th{background:var(--slate-100);text-align:left;padding:7px;font-weight:900;text-transform:uppercase;font-size:9px;color:var(--slate-600);}
+table.mini td{padding:7px;border-top:1px solid var(--slate-200);}
+
+/* EXCEL LIST TAB */
+.upload-groups{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+@media(max-width:900px){.upload-groups{grid-template-columns:1fr;}}
+.upload-slot{border:1px solid var(--card-border);border-radius:14px;padding:12px;background:#fff;}
+.upload-slot.disabled{opacity:.5;}
+.slot-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.slot-head .name{font-size:10px;font-weight:900;}
+.slot-drop{border:1.5px dashed var(--slate-300);border-radius:10px;padding:8px;text-align:center;font-size:9px;font-weight:700;color:var(--slate-400);cursor:pointer;margin-bottom:8px;}
+.slot-drop:hover{border-color:var(--blue);color:var(--blue);}
+.file-tag{display:inline-flex;align-items:center;gap:9px;background:var(--slate-100);border:1.5px solid var(--card-border);padding:9px 9px 9px 14px;border-radius:12px;font-size:11px;font-weight:800;margin:0 7px 7px 0;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.file-tag.ok{background:var(--emerald-l);border-color:#a7f3d0;color:#047857;}
+.file-tag.err{background:var(--rose-l);border-color:#fecdd3;color:#be123c;}
+.file-tag button{background:var(--slate-300);border:none;width:24px;height:24px;border-radius:99px;color:#fff;font-size:12px;line-height:1;flex-shrink:0;cursor:pointer;}
+.file-tag.ok button{background:#e11d48;}
+.file-tag.err button{background:#e11d48;}
+.file-tag button:hover{background:#be123c;}
+.err-msg{font-size:9px;color:#be123c;font-weight:700;margin-top:4px;background:var(--rose-l);border:1px solid #fecdd3;border-radius:8px;padding:6px 8px;}
+
+.filter-block{display:flex;flex-direction:column;gap:9px;}
+.filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-row .flabel{font-size:9px;font-weight:900;color:var(--slate-400);text-transform:uppercase;letter-spacing:.04em;width:52px;flex-shrink:0;}
+.filter-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.tag-btn{border:1px solid var(--slate-300);background:#fff;color:var(--slate-600);font-size:9px;font-weight:800;padding:5px 11px;border-radius:99px;}
+.tag-btn.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+.tag-sep{width:1px;height:16px;background:var(--slate-300);margin:0 4px;}
+
+.search-bar{position:relative;max-width:320px;}
+.search-bar input{width:100%;padding:8px 12px 8px 30px;border:1px solid var(--card-border);border-radius:12px;font-size:10px;font-weight:600;background:var(--slate-50);outline:none;}
+.search-bar .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--slate-400);font-size:11px;}
+.edit-action-btn{font-size:9px;font-weight:800;border-radius:8px;padding:6px 12px;border:1px solid;}
+.edit-action-btn.edit{color:var(--blue);background:var(--blue-l);border-color:#bfdbfe;}
+.edit-action-btn.save{color:#047857;background:var(--emerald-l);border-color:#a7f3d0;}
+.edit-action-btn.cancel{color:var(--slate-600);background:var(--slate-100);border-color:var(--slate-300);}
+.edit-action-btn.export{color:var(--indigo);background:var(--indigo-l);border-color:#c7d2fe;}
+.casing-warning{background:#fffbeb;border:1.5px solid #fde68a;border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.casing-warning .msg{font-size:11px;font-weight:700;color:#92400e;line-height:1.6;}
+.casing-warning .msg b{font-weight:900;}
+.casing-warning .fix-btn{flex-shrink:0;font-size:10px;font-weight:900;color:#fff;background:#d97706;border:none;border-radius:10px;padding:9px 16px;cursor:pointer;}
+.casing-warning .fix-btn:hover{background:#b45309;}
+.casing-warning .fix-btn.no{background:#94a3b8;}
+.casing-warning .fix-btn.no:hover{background:#64748b;}
+.locked{opacity:.5;pointer-events:none;}
+table.data td input{width:100%;border:1px solid var(--slate-300);border-radius:6px;padding:4px 6px;font-size:10px;font-family:inherit;}
+
+.excel-table-wrap{overflow-x:auto;border:1px solid var(--card-border);border-radius:12px;max-height:360px;overflow-y:auto;margin-top:12px;}
+table.data{width:100%;border-collapse:collapse;font-size:10px;}
+table.data thead{background:var(--slate-100);position:sticky;top:0;}
+table.data th{padding:9px;text-align:left;font-weight:900;text-transform:uppercase;font-size:9px;color:var(--slate-600);border-bottom:1px solid var(--card-border);}
+table.data td{padding:8px 9px;border-top:1px solid var(--slate-200);}
+table.data tr:hover td{background:var(--slate-50);}
+
+.empty-state{text-align:center;padding:26px 10px;color:var(--slate-400);font-size:10px;font-weight:700;}
+.toast{position:fixed;bottom:22px;right:22px;z-index:200;min-width:220px;max-width:340px;background:var(--emerald-l);border:1px solid #a7f3d0;color:#047857;padding:10px 14px;border-radius:12px;font-size:10px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(15,23,42,.18);}
+.hint{font-size:9px;color:var(--slate-400);font-weight:700;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="card header">
+    <div class="brand">
+      <div class="brand-icon">CI</div>
+      <div>
+        <div style="display:flex;align-items:center;">
+          <h1 class="brand-title">CIDC LOGO</h1>
+          <span class="brand-tag">CAREER &amp; INTERNSHIP CENTER</span>
+        </div>
+        <p class="brand-sub">Executive Performance &amp; Analytics Platform — Preview Build</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" id="tabbtn-dash" onclick="switchTab('dash')">📊 Dashboard</button>
+      <button class="nav-btn" id="tabbtn-excel" onclick="switchTab('excel')">📋 Excel List</button>
+    </nav>
+    <div class="live">
+      <span class="dot"></span>
+      <span id="clock">Live Sync Active</span>
+      <button class="refresh-btn" onclick="fullRefresh()" title="Refresh">⟳</button>
+    </div>
+  </header>
+
+  <!-- ========== DASHBOARD TAB ========== -->
+  <div id="tab-dash">
+
+    <div class="kpi-grid">
+      <div class="card kpi" style="border-left-color:var(--blue)">
+        <div><span class="lbl">Total Graduates Tracked</span><div class="val" id="kpi-total">—</div><p class="sub" id="kpi-total-sub">No data</p></div>
+        <div class="icon" style="background:var(--blue-l);color:var(--blue);border-color:#bfdbfe">🎓</div>
+      </div>
+      <div class="card kpi" style="border-left-color:var(--indigo)">
+        <div><span class="lbl">Overall Placement Rate</span><div class="val" id="kpi-placement">—</div><p class="sub" id="kpi-placement-sub">No data</p></div>
+        <div class="icon" style="background:var(--indigo-l);color:var(--indigo);border-color:#c7d2fe">💼</div>
+      </div>
+      <div class="card kpi" style="border-left-color:var(--teal)">
+        <div><span class="lbl">STEM / OPT Utilization</span><div class="val" id="kpi-opt">—</div><p class="sub" id="kpi-opt-sub">No data</p></div>
+        <div class="icon" style="background:var(--teal-l);color:var(--teal);border-color:#99f6e4">🛂</div>
+      </div>
+      <div class="card kpi" style="border-left-color:var(--amber)">
+        <div><span class="lbl">Student Satisfaction</span><div class="val" id="kpi-satisfaction">—</div><p class="sub" id="kpi-satisfaction-sub">No data</p></div>
+        <div class="icon" style="background:var(--amber-l);color:var(--amber);border-color:#fde68a">🏆</div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <!-- Employment & Internship -->
+      <div class="card" style="display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <span class="section-tag" style="color:var(--blue);background:var(--blue-l);border-color:#bfdbfe;">Cohort Analytics</span>
+            <h2 style="font-size:14px;font-weight:900;margin-top:8px;">Employment &amp; Internship Rate</h2>
+          </div>
+          <div class="legend">
+            <span style="color:var(--blue)"><span class="dotc" style="background:var(--blue)"></span>Full-Time</span>
+            <span style="color:var(--amber)"><span class="dotc" style="background:var(--amber)"></span>Internship</span>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="chart-employment"></canvas></div>
+        <div style="border-top:2px solid var(--slate-200);padding-top:10px;margin-top:4px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;font-weight:900;">Top Alumni Employer Destinations</span>
+            <span style="font-size:9px;font-weight:700;color:var(--blue);">Sorted by total placements</span>
+          </div>
+          <div class="logo-grid" id="company-logos"></div>
+          <p class="hint">Click to view the detailed Full-Time/Internship student list for that company.</p>
+        </div>
+      </div>
+
+      <!-- OPT -->
+      <div class="card" style="display:flex;flex-direction:column;">
+        <div>
+          <span class="section-tag" style="color:var(--teal);background:var(--teal-l);border-color:#99f6e4;">Visa &amp; Placement</span>
+          <h2 style="font-size:14px;font-weight:900;margin-top:8px;">OPT-USED Employment Rate</h2>
+        </div>
+        <div class="chart-box"><canvas id="chart-opt"></canvas></div>
+        <div class="opt-row">
+          <div class="opt-left">
+            <div class="subcard">
+              <label>Previous Years</label>
+              <div class="sel-wrap">
+                <select id="sel-cohort" onchange="onCohortChange()"></select>
+              </div>
+            </div>
+            <div class="subcard">
+              <label>Current Cohort</label>
+              <button class="reset-btn" onclick="resetCohort()">↺ <span id="current-cohort-lbl">Spring 2026</span></button>
+            </div>
+          </div>
+          <div class="donut-panel">
+            <div class="donut-half">
+              <span class="donut-tag">OPT USED</span>
+              <div class="donut-canvas-wrap" onclick="openOptModal()"><canvas id="chart-opt-donut"></canvas></div>
+              <span class="donut-result" id="opt-yes-lbl" style="color:#0d9488;">— Yes</span>
+            </div>
+            <div class="donut-half emp">
+              <span class="donut-tag">EMPLOYMENT</span>
+              <div class="donut-canvas-wrap" onclick="openEmpModal()"><canvas id="chart-emp-donut"></canvas></div>
+              <span class="donut-result" id="emp-yes-lbl" style="color:#4338ca;">— Yes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-bottom">
+      <!-- Satisfaction -->
+      <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card-head">
+          <h2><span class="dot-sm" style="background:var(--emerald)"></span>Satisfaction &amp; Consultation</h2>
+          <span class="badge" style="color:var(--emerald);background:var(--emerald-l);border-color:#a7f3d0;">STATS</span>
+        </div>
+        <div class="subcard" style="padding:10px;">
+          <div class="filter-grid">
+            <div>
+              <label style="font-size:9px;font-weight:900;color:var(--slate-500);text-transform:uppercase;display:block;margin-bottom:4px;">YEAR</label>
+              <select id="sel-consult-year" onchange="updateConsultation()" style="width:100%;padding:6px;border:1px solid var(--slate-300);border-radius:8px;font-size:10px;font-weight:700;"></select>
+            </div>
+            <div>
+              <label style="font-size:9px;font-weight:900;color:var(--slate-500);text-transform:uppercase;display:block;margin-bottom:4px;">SEASON</label>
+              <select id="sel-consult-season" onchange="updateConsultation()" style="width:100%;padding:6px;border:1px solid var(--slate-300);border-radius:8px;font-size:10px;font-weight:700;"></select>
+            </div>
+          </div>
+          <div class="consult-box">
+            <span style="font-size:9px;font-weight:900;color:var(--slate-500);text-transform:uppercase;">Season's Total Consultations</span>
+            <span class="cnt" id="consult-count">—</span>
+          </div>
+        </div>
+        <div class="subcard gauge-wrap">
+          <div class="gauge-canvas"><canvas id="chart-gauge"></canvas></div>
+          <div style="font-size:19px;font-weight:900;margin-top:2px;">98%</div>
+          <span style="font-size:10px;font-weight:800;color:var(--emerald);">★ 4–5 Star Proportion</span>
+        </div>
+        <div class="subcard review-box">
+          <div class="review-head">
+            <span>&ldquo; REVIEW</span>
+            <div style="display:flex;gap:4px;"><button class="nav-mini" onclick="prevFeedback()">‹</button><button class="nav-mini" onclick="nextFeedback()">›</button></div>
+          </div>
+          <p id="feedback-text" style="font-size:10px;font-style:italic;color:var(--slate-700);font-weight:600;margin-top:6px;"></p>
+          <div class="dots" id="feedback-dots"></div>
+        </div>
+      </div>
+
+      <!-- Events -->
+      <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card-head">
+          <h2><span class="dot-sm" style="background:var(--blue)"></span>Event Showcase &amp; Analytics</h2>
+          <span class="badge" style="color:var(--blue);background:var(--blue-l);border-color:#bfdbfe;">STATS</span>
+        </div>
+        <div class="event-shell">
+          <div class="event-col">
+            <div class="event-col-head">
+              <span>Event List</span>
+              <select id="event-year-select" onchange="onEventYearChange(this.value)" style="font-size:10px;font-weight:800;border:1px solid var(--card-border);border-radius:6px;padding:2px 4px;background:#fff;">
+                <option value="">All Years</option>
+              </select>
+              <span class="count-pill" id="event-count-pill" title="Cumulative total event count">TOTAL 0</span>
+            </div>
+            <div class="event-list" id="event-list"></div>
+          </div>
+          <div class="event-col">
+            <div class="photo-inner">
+              <div class="photo-topbar">
+                <span class="badge" style="background:var(--slate-200);color:var(--slate-700);border-color:var(--slate-300);">Event Info</span>
+                <div style="display:flex;gap:6px;"><button class="nav-mini" onclick="prevEvent()">‹</button><button class="nav-mini" onclick="nextEvent()">›</button></div>
+              </div>
+              <div class="photo-title-row">
+                <div class="photo-title-box"><h3 id="event-title">—</h3></div>
+                <div class="photo-meta"><span class="d" id="event-date">—</span><br><span class="a" id="event-attend">—</span></div>
+              </div>
+              <div class="photo-frame" id="event-photo-frame"><img id="event-photo" src="" alt=""></div>
+              <div class="photo-desc" id="event-desc">—</div>
+            </div>
+          </div>
+          <div class="event-col">
+            <div class="info-inner">
+              <div class="info-head"><span>RSVP → Attendance Conversion</span></div>
+              <div class="info-chart" style="height:150px;"><canvas id="chart-event-info"></canvas></div>
+              <div id="event-rsvp-stats" style="display:flex;justify-content:space-around;text-align:center;margin-top:8px;font-size:10px;font-weight:800;color:var(--slate-600);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sheet-links">
+        <button class="sheet-link-btn" onclick="switchTab('excel');setSheetFilter('Placement')">📊 Placement / OPT Sheet →</button>
+        <button class="sheet-link-btn" onclick="switchTab('excel');setSheetFilter('Consultation')">💬 Consultation →</button>
+        <button class="sheet-link-btn" onclick="switchTab('excel');setSheetFilter('Event')">📅 Event &amp; Budget →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== EXCEL LIST TAB ========== -->
+  <div id="tab-excel" style="display:none;">
+
+    <div class="card">
+      <div class="upload-groups">
+        <div class="upload-slot" id="slot-Placement" style="grid-column:1/-1;">
+          <div class="slot-head"><span class="name">📊 Placement / OPT Sheet <span style="font-weight:600;color:var(--slate-400);">(동일 포맷 — 하나로 통합)</span></span><span class="badge" style="color:var(--blue);background:var(--blue-l);border-color:#bfdbfe;" id="count-Placement">0 rows</span></div>
+          <div class="slot-drop" onclick="document.getElementById('file-Placement').click()">Click / Drop file — required columns: Cohort, UNID, Student Name, Major, Admin Year, Type, Company, Role, OPT-USED, Employment <span style="opacity:.7;">+ Note (선택)</span></div>
+          <input type="file" id="file-Placement" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleSheetUpload(event,'Placement')">
+          <div id="tags-Placement"></div>
+        </div>
+
+        <div class="upload-slot" id="slot-Event" style="grid-column:1/-1;">
+          <div class="slot-head"><span class="name">📅 Event Sheet <span style="font-weight:600;color:var(--slate-400);">(3개 파일 연동: 참여기록 / 이벤트 설명 / 사진)</span></span><span class="badge" style="color:var(--emerald);background:var(--emerald-l);border-color:#a7f3d0;" id="count-Event">0 events</span></div>
+          <div class="upload-groups" style="grid-template-columns:repeat(3,1fr);">
+            <div>
+              <div class="slot-drop" onclick="document.getElementById('file-EventRecords').click()">참여 기록 — Year, Date, Event Name, Event Type, RSVP Total, Actual Attendees, Attendance Rate <span style="opacity:.7;">+ Note (선택)</span></div>
+              <input type="file" id="file-EventRecords" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleSheetUpload(event,'EventRecords')">
+              <div id="tags-EventRecords"></div>
+            </div>
+            <div>
+              <div class="slot-drop" onclick="document.getElementById('file-EventDesc').click()">이벤트 설명 — Event Name, Description</div>
+              <input type="file" id="file-EventDesc" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleSheetUpload(event,'EventDesc')">
+              <div id="tags-EventDesc"></div>
+            </div>
+            <div>
+              <div class="slot-drop" onclick="document.getElementById('file-EventPhoto').click()">이벤트 사진 — 파일명 = Event Name</div>
+              <input type="file" id="file-EventPhoto" style="display:none" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+              <div id="tags-EventPhoto"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-slot disabled">
+          <div class="slot-head"><span class="name">💰 Budget Sheet</span><span class="badge" style="color:var(--slate-500);background:var(--slate-100);border-color:var(--slate-300);">비활성</span></div>
+          <div class="slot-drop" style="cursor:default;">추후 연동 예정 — 현재 비워둠</div>
+        </div>
+        <div class="upload-slot disabled">
+          <div class="slot-head"><span class="name">💬 Consultation Sheet</span><span class="badge" style="color:var(--slate-500);background:var(--slate-100);border-color:var(--slate-300);">비활성</span></div>
+          <div class="slot-drop" style="cursor:default;">추후 연동 예정 — 현재 비워둠</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="casing-warning" class="casing-warning" style="display:none;"></div>
+
+    <div class="card">
+      <div style="border-bottom:1px solid var(--card-border);padding-bottom:12px;">
+        <div class="filter-block">
+          <div class="filter-row"><span class="flabel">YEAR</span><div class="filter-tags" id="filter-year"></div></div>
+          <div class="filter-row"><span class="flabel">SEASON</span><div class="filter-tags" id="filter-season"></div></div>
+          <div class="filter-row"><span class="flabel">SHEET</span><div class="filter-tags" id="filter-sheet"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-top:10px;">
+        <div class="search-bar"><span class="ic">🔍</span><input type="text" id="search-input" placeholder="이름, 기업, 전공 등 검색..." oninput="renderTable()"></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="table-info" style="font-size:10px;font-weight:700;color:var(--slate-500);"></span>
+          <button id="export-btn" class="edit-action-btn export" onclick="exportTableToCSV()">⬇ CSV 내보내기</button>
+          <button id="edit-btn" class="edit-action-btn edit" onclick="enterEditMode()">✏ 수정하기</button>
+          <button id="save-btn" class="edit-action-btn save" style="display:none;" onclick="saveEdits()">💾 저장하기</button>
+          <button id="cancel-btn" class="edit-action-btn cancel" style="display:none;" onclick="cancelEdits()">취소</button>
+        </div>
+      </div>
+      <div class="excel-table-wrap"><table class="data"><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div>
+      <div id="excel-toast" class="toast" style="display:none;"><span>✓ 데이터가 반영되었습니다.</span><button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:#047857;font-weight:900;">×</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-head"><h3 id="modal-title">Detail</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+<div class="error-banner" id="app-error-banner"></div>
+
+<script>
+/* ============ SEEDED RNG & MOCK DATA ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rng = mulberry32(1234);
+const COHORTS = ['Spring 2022','Fall 2022','Spring 2023','Fall 2023','Spring 2024','Fall 2024','Spring 2025','Spring 2026']; // 목업 프리뷰용 기본값(업로드 데이터가 없을 때만 사용)
+
+/* 실제 업로드된 데이터에 등장하는 cohort들을 연도·학기 순서로 정렬해서 반환.
+   2021년처럼 새 연도가 들어와도 자동으로 그래프에 앞순서로 반영됨. */
+function cohortSortKey(c){
+  const str = String(c);
+  const m = str.match(/(spring|summer|fall|winter)\s*(\d{4})/i);
+  if(m){
+    const seasonOrder = {spring:1, summer:2, fall:3, winter:4};
+    return parseInt(m[2],10)*10 + (seasonOrder[m[1].toLowerCase()] || 0);
+  }
+  // "Spring/Fall" 같은 학기 표기 없이 연도만 있는 cohort(예: "2021")도 해당 연도 맨 앞으로 정렬
+  const y = str.match(/(\d{4})/);
+  if(y) return parseInt(y[1],10)*10;
+  return 999999;
+}
+function getSortedCohorts(){
+  const set = new Set(state.students.map(s=>s.cohort).filter(Boolean));
+  if(set.size===0) return COHORTS;
+  return Array.from(set).sort((a,b)=>cohortSortKey(a)-cohortSortKey(b));
+}
+const COMPANIES = [
+  {name:'Apple',color:'#1e293b'},{name:'Google',color:'#2563eb'},{name:'Microsoft',color:'#0284c7'},
+  {name:'Amazon',color:'#d97706'},{name:'Meta',color:'#4f46e5'},{name:'GitHub',color:'#334155'},
+  {name:'Slack',color:'#059669'},{name:'Spotify',color:'#16a34a'},{name:'Tesla',color:'#dc2626'},{name:'Netflix',color:'#b91c1c'}
+];
+const MAJORS = ['Computer Science','Data Science','UX Design','Business Analytics','Information Systems','Cybersecurity'];
+const ROLES = ['Software Engineer','Data Analyst','Product Designer','Financial Analyst','Systems Engineer','Security Analyst'];
+
+function genStudents(){
+  let arr=[]; let uid=1000;
+  COHORTS.forEach((cohort,ci)=>{
+    const n = 22 + Math.floor(rng()*14);
+    for(let i=0;i<n;i++){
+      const type = rng()<0.6 ? 'Full-Time':'Internship';
+      const optUsed = rng() < (0.55 + ci*0.02) ? 'Yes':'No';
+      const employment = optUsed==='Yes' ? (rng()<0.86?'Yes':'No') : (rng()<0.4?'Yes':'No');
+      arr.push({
+        cohort, unid:'U'+(uid++), name: 'Student '+uid,
+        major: MAJORS[Math.floor(rng()*MAJORS.length)],
+        adminYear: 2022+Math.floor(ci/2),
+        type,
+        company: COMPANIES[Math.floor(rng()*COMPANIES.length)].name,
+        role: ROLES[Math.floor(rng()*ROLES.length)],
+        optUsed, employment
+      });
+    }
+  });
+  return arr;
+}
+
+function genEvents(){
+  return {
+    records: [
+      {name:'OPT Workshop & Legal Seminar', type:'Workshop', year:2026, date:'2026-02-15', count:220},
+      {name:'Annual Spring Career Fair 2026', type:'Career Talk', year:2026, date:'2026-03-10', count:450},
+      {name:'Tech Alumni Networking Night', type:'Info Session', year:2026, date:'2026-02-28', count:180},
+      {name:'Resume & Portfolio Review Blitz', type:'Workshop', year:2026, date:'2026-01-20', count:310},
+      {name:'Summer Boot Camp Kickoff', type:'Boot Camp', year:2025, date:'2025-06-05', count:140}
+    ],
+    desc: {
+      'OPT Workshop & Legal Seminar':'Comprehensive visa & STEM OPT guidance with certified immigration attorneys.',
+      'Annual Spring Career Fair 2026':'Over 50 global tech and finance corporations recruiting on-campus.',
+      'Tech Alumni Networking Night':'Direct 1-on-1 mentorship with senior engineers from Silicon Valley.',
+      // Resume Blitz intentionally missing description to demo blank-state fallback
+    },
+    photo: {
+      'OPT Workshop & Legal Seminar':'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=70',
+      'Annual Spring Career Fair 2026':'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=70',
+      'Resume & Portfolio Review Blitz':'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&auto=format&fit=crop&q=70',
+      'Summer Boot Camp Kickoff':'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=70'
+      // Tech Alumni Networking Night intentionally missing photo to demo blank-state fallback
+    },
+    descSourceFile: {} // eventName -> fileId (파일 삭제 시 해당 설명만 제거하기 위한 추적용, 목업 데이터는 대상 아님)
+  };
+}
+
+const FEEDBACKS = [
+  '"The Career Fair organized by CIDC was directly responsible for my full-time offer at Microsoft!"',
+  '"10/10 mock interview sessions. I felt 100% prepared for tech screen questions at Apple!"',
+  '"The OPT legal seminar clarified all my F1 visa questions and streamlined my EAD application."'
+];
+const CONSULT_MAP = {
+  '2026-Spring':1420,'2026-Summer':980,'2026-Fall':1250,
+  '2025-Spring':1380,'2025-Summer':890,'2025-Fall':1190
+};
+
+let state = {
+  students: [], // 처음엔 완전히 빈 상태 — 실제로 업로드한 파일에서만 데이터가 채워짐
+  events: { records:[], desc:{}, photo:{}, descSourceFile:{} },
+  uploadedFiles: { Placement:[], EventRecords:[], EventDesc:[], EventPhoto:[] },
+  cohortFilter: 'All Cohorts',
+  currentEventIdx: 0,
+  currentFeedbackIdx: 0,
+  yearFilter: new Set(), seasonFilter: new Set(), sheetFilter: 'Placement', editMode: false,
+  fileIdSeq: 0,
+  studentUidSeq: 0,
+  eventYearFilter: null, // null = 전체(누적) 연도 보기
+  charts: {}
+};
+function nextFileId(){ return ++state.fileIdSeq; }
+function nextStudentUid(){ return ++state.studentUidSeq; }
+
+const REQUIRED_COLS = ['Cohort','UNID','Student Name','Major','Admin Year','Type','Company','Role','OPT-USED','Employment'];
+const OPTIONAL_COLS_PLACEMENT = ['Note']; // 있으면 마지막 열로 반영, 없어도 오류 아님
+const REQUIRED_COLS_EVENT = ['Year','Date','Event Name','Event Type','RSVP Total','Actual Attendees','Attendance Rate'];
+const OPTIONAL_COLS_EVENT = ['Note'];
+const REQUIRED_COLS_DESC = ['Event Name','Description'];
+
+/* ============ TAB SWITCH ============ */
+function switchTab(t){
+  if(state.editMode && t!=='excel') cancelEdits();
+  document.getElementById('tab-dash').style.display = t==='dash' ? 'flex':'none';
+  document.getElementById('tab-dash').style.flexDirection='column';
+  document.getElementById('tab-dash').style.gap='16px';
+  document.getElementById('tab-excel').style.display = t==='excel' ? 'flex':'none';
+  document.getElementById('tab-excel').style.flexDirection='column';
+  document.getElementById('tab-excel').style.gap='16px';
+  document.getElementById('tabbtn-dash').classList.toggle('active', t==='dash');
+  document.getElementById('tabbtn-excel').classList.toggle('active', t==='excel');
+  if(t==='dash') requestAnimationFrame(renderDashboard);
+  if(t==='excel') requestAnimationFrame(renderExcelTab);
+}
+function setSheetFilter(s){ state.sheetFilter = s; buildFilterTags(); renderTable(); }
+
+/* ============ CLOCK ============ */
+function tickClock(){
+  const el = document.getElementById('clock');
+  const now = new Date();
+  el.innerText = 'Live Sync Active • ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(tickClock,30000); tickClock();
+function fullRefresh(){ renderDashboard(); renderExcelTab(); }
+
+/* ============ HELPERS ============ */
+function pct(n,d){ return d>0 ? Math.round(n/d*100) : 0; }
+function byCohort(list, cohort){ return cohort==='All Cohorts' ? list : list.filter(s=>s.cohort===cohort); }
+/* 실제 엑셀 데이터의 대소문자 표기(Full-Time, FULL-TIME, full-time 등)가 달라도 동일하게 인식 */
+function isFullTime(v){ const n=String(v||'').trim().toLowerCase(); return n==='full-time' || n==='full time' || n==='fulltime'; }
+function isInternship(v){ const n=String(v||'').trim().toLowerCase(); return n==='internship' || n==='intern'; }
+function isYes(v){ return String(v||'').trim().toLowerCase()==='yes'; }
+
+/* ---- 데이터 정리 감지 & 일괄 수정 ----
+   1) 표기 불일치(casing/축약형): Full-time/FULL-TIME/intern 등 — 값은 무관하게 정상 집계되지만 표준 표기와 다르면 알려줌
+   2) "값 없음"을 텍스트로 적어놓은 경우(N/A, null, none, -, TBD 등) — 실제로는 빈칸(null)이어야 정확히 집계됨
+   둘 다 노란 경고 배너로 모아서 보여주고, 확인하면 한 번에 정리함 */
+const CANONICAL_TYPE = { 'full-time':'Full-Time', 'full time':'Full-Time', 'fulltime':'Full-Time', 'internship':'Internship', 'intern':'Internship' };
+const CANONICAL_YESNO = { 'yes':'Yes', 'no':'No' };
+function canonicalFor(field, value){
+  if(value===null || value===undefined) return null;
+  const norm = String(value).trim().toLowerCase();
+  if(field==='type') return CANONICAL_TYPE[norm] || null;
+  return CANONICAL_YESNO[norm] || null;
+}
+const NULL_LIKE_VALUES = new Set(['n/a','na','null','none','nil','undefined','-','--','unknown','tbd','nan','empty']);
+function isNullLike(v){
+  if(v===null || v===undefined) return false;
+  return NULL_LIKE_VALUES.has(String(v).trim().toLowerCase());
+}
+function isValidAdminYear(v){
+  if(v===null || v===undefined || isNullLike(v)) return true;
+  const n = Number(String(v).trim());
+  return Number.isInteger(n) && n>=2000 && n<=2099;
+}
+function isValidCohortFormat(v){
+  if(v===null || v===undefined || isNullLike(v)) return true;
+  return /^((spring|summer|fall|winter)\s+)?\d{4}$/i.test(String(v).trim());
+}
+const ALL_STUDENT_FIELDS = ['cohort','unid','name','major','adminYear','type','company','role','optUsed','employment','note'];
+const FIELD_LABEL = { cohort:'Cohort', unid:'UNID', name:'Student Name', major:'Major', adminYear:'Admin Year', type:'Type', company:'Company', role:'Role', optUsed:'OPT-USED', employment:'Employment', note:'Note' };
+const TRASH_ICON_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>`;
+
+/* fixable: 자동으로 고칠 수 있는 것(표기 불일치, "값없음" 텍스트) / format: 형식이 이상하거나 스펠링 오류로 의심되어 자동수정은 불가하고 직접 확인이 필요한 것 */
+function detectDataIssues(){
+  const fixableMap = {};
+  const formatMap = {};
+  function addFixable(kind, field, wrong, canonical){
+    const key = kind+'|'+field+'|'+wrong;
+    if(!fixableMap[key]) fixableMap[key] = { kind, field, wrong, canonical, count:0 };
+    fixableMap[key].count++;
+  }
+  function addFormat(field, wrong){
+    const key = field+'|'+wrong;
+    if(!formatMap[key]) formatMap[key] = { kind:'format', field, wrong, count:0 };
+    formatMap[key].count++;
+  }
+  state.students.forEach(s=>{
+    ALL_STUDENT_FIELDS.forEach(field=>{
+      const v = s[field];
+      if(isNullLike(v)) addFixable('blank', field, v, null);
+    });
+    ['type','optUsed','employment'].forEach(field=>{
+      const v = s[field];
+      if(v===null || v===undefined || isNullLike(v)) return;
+      const canon = canonicalFor(field, v);
+      if(canon && canon !== v) addFixable('casing', field, v, canon);
+      else if(!canon) addFormat(field, v); // 인식 자체가 안 되는 값 — 오타/형식 오류 의심
+    });
+    if(!isValidAdminYear(s.adminYear)) addFormat('adminYear', s.adminYear);
+    if(!isValidCohortFormat(s.cohort)) addFormat('cohort', s.cohort);
+  });
+  return { fixable: Object.values(fixableMap), format: Object.values(formatMap) };
+}
+
+/* UNID 기준으로만 그룹핑 — 같은 코호트에 중복 등록된 경우뿐 아니라, 같은 사람(UNID)이 서로 다른 코호트에 걸쳐 나타나는 경우도 중복으로 감지 */
+function detectDuplicates(){
+  const groups = {};
+  state.students.forEach(s=>{
+    if(!s.unid) return;
+    const key = String(s.unid).trim().toLowerCase();
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(s);
+  });
+  return Object.values(groups).filter(g=>g.length>1);
+}
+
+function refreshCasingWarning(){
+  const el = document.getElementById('casing-warning');
+  if(!el) return;
+  const { fixable, format } = detectDataIssues();
+  const dupGroups = detectDuplicates();
+  if(fixable.length===0 && format.length===0 && dupGroups.length===0){ el.style.display='none'; el.innerHTML=''; return; }
+
+  let html = '<div style="display:flex;flex-direction:column;gap:10px;width:100%;">';
+  if(fixable.length){
+    const summary = fixable.map(i=> i.kind==='blank'
+      ? `${FIELD_LABEL[i.field]} "${i.wrong}" → 빈칸 (${i.count}건)`
+      : `${FIELD_LABEL[i.field]} "${i.wrong}" → "${i.canonical}" (${i.count}건)`
+    ).join(', ');
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="msg">⚠ <b>정리가 필요한 값이 있습니다</b>: ${summary}</div>
+      <button class="fix-btn" onclick="applyCasingFix()">한 번에 정리하기</button>
+    </div>`;
+  }
+  if(format.length){
+    const summary = format.map(i=>`${FIELD_LABEL[i.field]||i.field} "${i.wrong}" (${i.count}건)`).join(', ');
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="msg">🔎 <b>형식/스펠링 오류가 의심되는 값</b>: ${summary}</div>
+      <button class="fix-btn" onclick="openFormatIssueModal()">확인하며 수정하기</button>
+    </div>`;
+  }
+  if(dupGroups.length){
+    const total = dupGroups.reduce((a,g)=>a+g.length,0);
+    html += `<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="msg">📑 <b>중복 의심 데이터</b>: 같은 UNID가 ${dupGroups.length}건 그룹(같은 코호트 중복 + 여러 코호트에 걸친 경우 포함), 총 ${total}행</div>
+      <button class="fix-btn" onclick="openDuplicateModal()">중복 검토하기</button>
+    </div>`;
+  }
+  html += '</div>';
+  el.style.display = 'flex';
+  el.innerHTML = html;
+}
+
+/* ---- 형식/스펠링 의심 값: 목록에서 직접 값을 고쳐서 저장 (예/아니오 컨펌 후 반영) ---- */
+function openFormatIssueModal(){
+  const { format } = detectDataIssues();
+  if(format.length===0){ showToast('확인이 필요한 값이 없습니다.'); refreshCasingWarning(); return; }
+  const rows = format.map((i,idx)=>{
+    const wrongEsc = String(i.wrong).replace(/"/g,'&quot;');
+    return `
+      <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--card-border);border-radius:8px;padding:8px;margin-bottom:6px;">
+        <div style="flex:0 0 90px;font-weight:900;font-size:10px;">${FIELD_LABEL[i.field]||i.field}</div>
+        <div style="flex:0 0 110px;font-size:10px;color:#e11d48;text-decoration:line-through;">${i.wrong}</div>
+        <span style="font-size:10px;color:var(--slate-400);">→</span>
+        <input type="text" id="fmt-fix-${idx}" data-field="${i.field}" data-wrong="${wrongEsc}" value="${wrongEsc}"
+          style="flex:1;border:1px solid var(--card-border);border-radius:6px;padding:5px 8px;font-size:10px;">
+        <span style="font-size:9px;color:var(--slate-400);flex:0 0 auto;">${i.count}건</span>
+      </div>`;
+  }).join('');
+  document.getElementById('modal-title').innerText = '형식/스펠링 확인 및 수정';
+  document.getElementById('modal-body').innerHTML = `
+    <div id="fmt-fix-scope">
+      <div style="font-size:10px;color:var(--slate-500);margin-bottom:10px;">값을 직접 입력해 고친 뒤 저장하면 해당 값을 가진 모든 행에 반영됩니다. 값을 비우면 빈칸으로 저장됩니다.</div>
+      ${rows}
+    </div>
+    <div id="fmt-fix-footer" style="margin-top:12px;"></div>`;
+  renderFmtFixFooter('save');
+  document.getElementById('modal').classList.add('show');
+}
+/* mode: 'save' = 저장하기 버튼만 / 'confirm' = 예·아니오 버튼만 (동시에 두 개가 같이 뜨지 않도록 항상 서로 교체) */
+function renderFmtFixFooter(mode){
+  const footer = document.getElementById('fmt-fix-footer');
+  if(!footer) return;
+  if(mode==='confirm'){
+    footer.innerHTML = `
+      <div class="msg" style="margin-bottom:8px;">🟡 <b>입력한 값으로 저장할까요?</b></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="fix-btn" onclick="confirmFormatFixSave(true)">✅ 예, 저장합니다</button>
+        <button class="fix-btn no" onclick="confirmFormatFixSave(false)">❌ 아니오</button>
+      </div>`;
+  } else {
+    footer.innerHTML = `<div style="display:flex;justify-content:flex-end;">
+      <button class="fix-btn" onclick="renderFmtFixFooter('confirm')">저장하기</button>
+    </div>`;
+  }
+}
+function confirmFormatFixSave(apply){
+  if(apply){
+    // 반드시 <input> 태그만 선택해야 함 — 'id^="fmt-fix-"'만 쓰면 #fmt-fix-scope/#fmt-fix-footer 같은 컨테이너 div까지
+    // 같이 잡혀서 div.value.trim()에서 오류가 나고, 그 오류 때문에 이 함수가 저장 로직에 도달하기도 전에 조용히 멈췄던 것이 원인이었음.
+    const inputs = document.querySelectorAll('input[id^="fmt-fix-"]');
+    let changed = 0;
+    inputs.forEach(inp=>{
+      const field = inp.dataset.field;
+      const wrong = inp.dataset.wrong;
+      const newValRaw = inp.value.trim();
+      const newVal = newValRaw === '' ? null : newValRaw;
+      if(newValRaw === wrong) return; // 변경 없음
+      state.students.forEach(s=>{
+        if(s[field]!==null && s[field]!==undefined && String(s[field]) === wrong){ s[field] = newVal; changed++; }
+      });
+    });
+    // 입력한 값(안 고친 값 포함) 그대로 저장 후 항상 "저장되었습니다"를 보여주고 닫음 —
+    // 사용자가 일부만 고치고 나머지는 그대로 둘 수도 있으므로 여기서 막지 않음.
+    // 화면 갱신 중 실제 오류가 나면 그것대로 숨기지 않고 별도의 지속 알림(app-error-banner)으로 계속 띄워둠.
+    let renderError = null;
+    try{ renderTable(); }catch(e){ renderError = e; console.error('renderTable failed', e); }
+    try{ renderDashboard(); }catch(e){ renderError = renderError || e; console.error('renderDashboard failed', e); }
+    try{ refreshCasingWarning(); }catch(e){ renderError = renderError || e; console.error('refreshCasingWarning failed', e); }
+
+    const scope = document.getElementById('fmt-fix-scope');
+    const footer = document.getElementById('fmt-fix-footer');
+    if(scope) scope.innerHTML = `<div style="text-align:center;padding:22px 10px;color:#047857;font-size:12px;font-weight:900;">✅ ${changed ? changed+'건이 저장되었습니다.' : '반영되었습니다.'}<br><span style="font-size:10px;font-weight:700;color:var(--slate-400);">5초 후 창이 자동으로 닫힙니다…</span></div>`;
+    if(footer) footer.innerHTML = '';
+    setTimeout(()=>{ closeModal(); showToast(changed ? `${changed}건을 수정했습니다.` : '반영되었습니다.'); }, 5000);
+    if(renderError){
+      showPersistentError('화면 갱신 중 오류가 발생했습니다: '+String(renderError.message||renderError)+' — 새로고침 후 반영 여부를 확인해주세요.');
+    }
+  } else {
+    renderFmtFixFooter('save');
+  }
+}
+
+/* 일괄수정은 브라우저 기본 confirm() 대신 배너 안에서 예/아니오 버튼 두 개로 물어봄 */
+function applyCasingFix(){
+  const el = document.getElementById('casing-warning');
+  const { fixable } = detectDataIssues();
+  if(fixable.length===0 || !el) return;
+  const summary = fixable.map(i=> i.kind==='blank'
+    ? `· ${FIELD_LABEL[i.field]}: "${i.wrong}" → 빈칸 (${i.count}건)`
+    : `· ${FIELD_LABEL[i.field]}: "${i.wrong}" → "${i.canonical}" (${i.count}건)`
+  ).join('<br>');
+  el.innerHTML = `
+    <div class="msg">🟡 <b>아래 값들을 정리할까요?</b><br>${summary}</div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button class="fix-btn" onclick="confirmCasingFix(true)">✅ 예, 수정합니다</button>
+      <button class="fix-btn no" onclick="confirmCasingFix(false)">❌ 아니오</button>
+    </div>`;
+}
+function confirmCasingFix(apply){
+  if(apply){
+    state.students.forEach(s=>{
+      ALL_STUDENT_FIELDS.forEach(field=>{
+        if(isNullLike(s[field])) s[field] = null;
+      });
+      ['type','optUsed','employment'].forEach(field=>{
+        const canon = canonicalFor(field, s[field]);
+        if(canon && canon !== s[field]) s[field] = canon;
+      });
+    });
+    // 값 수정은 여기서 이미 반영됨 — 항상 "정리했습니다"를 보여줌.
+    // 화면 갱신 중 실제 오류가 나더라도 숨기지 않고 별도의 지속 알림(app-error-banner)으로 계속 띄워둠.
+    let renderError = null;
+    try{ renderTable(); }catch(e){ renderError = e; console.error('renderTable failed', e); }
+    try{ renderDashboard(); }catch(e){ renderError = renderError || e; console.error('renderDashboard failed', e); }
+    showToast('데이터를 정리했습니다.');
+    if(renderError){
+      showPersistentError('화면 갱신 중 오류가 발생했습니다: '+String(renderError.message||renderError)+' — 새로고침 후 반영 여부를 확인해주세요.');
+    }
+  }
+  try{ refreshCasingWarning(); }catch(e){ console.error('refreshCasingWarning failed', e); }
+}
+
+/* ---- 중복 검토 모달 ---- */
+function openDuplicateModal(){
+  const groups = detectDuplicates();
+  if(groups.length===0){ showToast('중복 데이터가 없습니다.'); refreshCasingWarning(); return; }
+  const dupCols = SHEET_COLUMNS.Placement; // Cohort, UNID, Student Name, Major, Admin Year, Type, Company, Role, OPT-USED, Employment, Note — 전체 컬럼을 그대로 다 보여줌
+  const body = groups.map((g,gi)=>{
+    const cohorts = [...new Set(g.map(s=>s.cohort||'(no cohort)'))];
+    const multiCohort = cohorts.length>1;
+    return `
+    <div style="margin-bottom:14px;border:1px solid var(--card-border);border-radius:10px;overflow:hidden;">
+      <div style="background:var(--amber-l);padding:8px 10px;font-weight:900;font-size:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span>UNID ${g[0].unid} · ${g[0].name??''} — ${g.length}건 중복${multiCohort ? ' (여러 코호트: '+cohorts.join(', ')+')' : ' · '+cohorts[0]}</span>
+        <button class="fix-btn" style="padding:5px 10px;" onclick="keepLatestDuplicate(${gi})">최근 코호트만 남기기</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="mini" style="white-space:nowrap;">
+          <thead><tr>${dupCols.map(c=>`<th>${c.header}</th>`).join('')}<th></th></tr></thead>
+          <tbody>${g.map(s=>`<tr>${dupCols.map(c=>`<td>${s[c.key]??''}</td>`).join('')}<td><button onclick="deleteStudentByUid(${s._uid})" title="삭제" style="color:#e11d48;background:none;border:none;cursor:pointer;line-height:1;padding:2px;display:flex;align-items:center;">${TRASH_ICON_SVG}</button></td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('modal-title').innerText = '중복 데이터 검토';
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-box')?.classList.add('wide'); // 컬럼이 많아 가로로 넓게 보이도록
+  document.getElementById('modal').classList.add('show');
+}
+function refreshDuplicateModalOrClose(){
+  const groups = detectDuplicates();
+  let renderError = null;
+  try{ updateSlotCounts(); }catch(e){ renderError = e; console.error('updateSlotCounts failed', e); }
+  try{ renderTable(); }catch(e){ renderError = renderError || e; console.error('renderTable failed', e); }
+  try{ renderDashboard(); }catch(e){ renderError = renderError || e; console.error('renderDashboard failed', e); }
+  try{ refreshCasingWarning(); }catch(e){ renderError = renderError || e; console.error('refreshCasingWarning failed', e); }
+  if(renderError) showPersistentError('화면 갱신 중 오류가 발생했습니다: '+String(renderError.message||renderError)+' — 새로고침 후 반영 여부를 확인해주세요.');
+  if(groups.length===0){ closeModal(); showToast('중복이 모두 정리되었습니다.'); }
+  else openDuplicateModal();
+}
+function deleteStudentByUid(uid){
+  state.students = state.students.filter(s=>s._uid !== uid);
+  refreshDuplicateModalOrClose();
+}
+/* 업로드 순서가 아니라 코호트를 연도·학기 순으로 정렬해 실제로 가장 최근 코호트인 행만 남김(코호트가 여러 개에 걸쳐 있는 경우 포함) */
+function keepLatestDuplicate(groupIdx){
+  const groups = detectDuplicates();
+  const g = groups[groupIdx];
+  if(!g) return;
+  const sorted = [...g].sort((a,b)=>cohortSortKey(a.cohort)-cohortSortKey(b.cohort));
+  const keep = sorted[sorted.length-1];
+  const toRemove = new Set(g.filter(s=>s!==keep).map(s=>s._uid));
+  state.students = state.students.filter(s=>!toRemove.has(s._uid));
+  refreshDuplicateModalOrClose();
+}
+
+function exportTableToCSV(){
+  const cols = SHEET_COLUMNS[state.sheetFilter] || [];
+  const data = getFilteredData();
+  if(cols.length===0 || data.length===0){ showToast('내보낼 데이터가 없습니다.'); return; }
+  const esc = v=>{ v = (v===null||v===undefined)?'':String(v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const csv = [cols.map(c=>esc(c.header)).join(',')].concat(
+    data.map(row=>cols.map(c=>esc(row[c.key])).join(','))
+  ).join('\r\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'CIDC_'+state.sheetFilter+'.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showToast(state.sheetFilter+' 시트를 CSV로 내보냈습니다.');
+}
+
+/* ============ DASHBOARD RENDER ============ */
+function renderDashboard(){
+  renderKPIs();
+  renderEmploymentChart();
+  renderCompanyLogos();
+  populateCohortSelect();
+  renderOptSection();
+  populateConsultSelects();
+  updateConsultation();
+  renderGauge();
+  renderFeedback();
+  populateEventYearSelect();
+  renderEventList();
+  renderCurrentEvent();
+}
+
+function renderKPIs(){
+  const s = state.students;
+  const totalEl=document.getElementById('kpi-total'), totalSub=document.getElementById('kpi-total-sub');
+  if(s.length===0){ totalEl.innerText='—'; totalSub.innerText='No data uploaded'; }
+  else { totalEl.innerText=s.length.toLocaleString(); totalSub.innerText='Cohorts '+COHORTS[0]+' – '+COHORTS[COHORTS.length-1]; }
+
+  const placementEl=document.getElementById('kpi-placement'), placementSub=document.getElementById('kpi-placement-sub');
+  if(s.length===0){ placementEl.innerText='—'; placementSub.innerText='No data'; }
+  else{ const placed=s.filter(x=>isFullTime(x.type)||isInternship(x.type)).length; placementEl.innerText=pct(placed,s.length)+'%'; placementSub.innerText='(Full-Time + Internship) / Total Students'; }
+
+  const optEl=document.getElementById('kpi-opt'), optSub=document.getElementById('kpi-opt-sub');
+  if(s.length===0){ optEl.innerText='—'; optSub.innerText='No data'; }
+  else{ const opt=s.filter(x=>isYes(x.optUsed)).length; optEl.innerText=pct(opt,s.length)+'%'; optSub.innerText='Verified US employment status'; }
+
+  const satEl=document.getElementById('kpi-satisfaction'), satSub=document.getElementById('kpi-satisfaction-sub');
+  satEl.innerText='98.4%'; satSub.innerText='Top rating from surveys';
+}
+
+function computeEmploymentByCohort(){
+  return getSortedCohorts().map(c=>{
+    const rows = state.students.filter(s=>s.cohort===c);
+    const ft = rows.filter(s=>isFullTime(s.type)).length;
+    const intern = rows.filter(s=>isInternship(s.type)).length;
+    return {cohort:c, ft, intern, total:rows.length};
+  });
+}
+
+function renderEmploymentChart(){
+  const data = computeEmploymentByCohort();
+  const ctx = document.getElementById('chart-employment');
+  if(state.charts.emp) state.charts.emp.destroy();
+  if(data.every(d=>d.total===0)){
+    ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
+    return;
+  }
+  state.charts.emp = new Chart(ctx,{
+    type:'line',
+    data:{ labels:data.map(d=>d.cohort), datasets:[
+      {label:'Full-Time', data:data.map(d=>d.ft), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,.1)', fill:true, tension:.35, borderWidth:3, pointRadius:3},
+      {label:'Internship', data:data.map(d=>d.intern), borderColor:'#d97706', borderDash:[4,4], backgroundColor:'transparent', tension:.35, borderWidth:2, pointRadius:2}
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{
+        title: (items)=>items[0].label,
+        label: (item)=>{
+          const d = data[item.dataIndex];
+          const val = item.dataset.label==='Full-Time'?d.ft:d.intern;
+          const p = pct(val, d.total);
+          return item.dataset.label+': '+val+' students ('+p+'%)';
+        }
+      }}},
+      scales:{ y:{grid:{color:'#f1f5f9'},ticks:{font:{size:8}}}, x:{grid:{display:false},ticks:{font:{size:8}}} }
+    }
+  });
+}
+
+function renderCompanyLogos(){
+  const grid = document.getElementById('company-logos');
+  if(state.students.length===0){ grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No data — upload a Placement file in Excel List.</div>'; return; }
+  const totals = {};
+  state.students.forEach(s=>{ totals[s.company]=(totals[s.company]||0)+1; });
+  const ranked = Object.keys(totals).map(name=>({name,count:totals[name]})).sort((a,b)=>b.count-a.count).slice(0,8);
+  grid.innerHTML = ranked.map(c=>{
+    const meta = COMPANIES.find(x=>x.name===c.name) || {color:'#334155'};
+    return `<div class="logo-card" onclick="openCompanyModal('${c.name}')">
+      <div class="logo-badge" style="background:${meta.color}">${c.name.slice(0,2).toUpperCase()}</div>
+      <div class="logo-count">${c.count}</div>
+    </div>`;
+  }).join('');
+}
+
+function openCompanyModal(company){
+  const rows = state.students.filter(s=>s.company===company);
+  const ft = rows.filter(r=>isFullTime(r.type)).length;
+  const conv = pct(ft, rows.length);
+  const majors = {}; rows.forEach(r=>majors[r.major]=(majors[r.major]||0)+1);
+  const topMajor = Object.keys(majors).sort((a,b)=>majors[b]-majors[a])[0] || '—';
+  document.getElementById('modal-title').innerText = company + ' — Alumni Detail';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-stats">
+      <div class="modal-stat"><b>${rows.length}</b>Total Students</div>
+      <div class="modal-stat"><b>${conv}%</b>Full-Time Conversion</div>
+      <div class="modal-stat"><b>${topMajor}</b>Top Major</div>
+    </div>
+    <table class="mini"><thead><tr><th>UNID</th><th>Name</th><th>Cohort</th><th>Type</th><th>Role</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${r.unid}</td><td>${r.name}</td><td>${r.cohort}</td><td>${r.type}</td><td>${r.role}</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+  document.getElementById('modal-box')?.classList.remove('wide'); // 다음 모달은 기본 폭으로 복귀
+}
+/* 화면 갱신 중 실제 오류가 발생했을 때 사용자가 계속 알아볼 수 있게 남겨두는 고정 알림(자동으로 사라지지 않음, 직접 닫아야 함) */
+function showPersistentError(msg){
+  const el = document.getElementById('app-error-banner');
+  if(!el) return;
+  el.style.display = 'flex';
+  el.innerHTML = `<span>⚠ ${msg}</span><button onclick="document.getElementById('app-error-banner').style.display='none'" style="background:none;border:none;color:#b91c1c;font-weight:900;cursor:pointer;flex-shrink:0;">✕</button>`;
+}
+
+/* ---- OPT section ---- */
+function populateCohortSelect(){
+  const sel = document.getElementById('sel-cohort');
+  const cohorts = getSortedCohorts();
+  sel.innerHTML = '<option value="All Cohorts">All Cohorts</option>' + cohorts.map(c=>`<option value="${c}">${c}</option>`).join('');
+  sel.value = state.cohortFilter;
+  const latest = cohorts[cohorts.length-1] || '—';
+  const lbl = document.getElementById('current-cohort-lbl');
+  if(lbl) lbl.innerText = latest;
+}
+function onCohortChange(){ state.cohortFilter = document.getElementById('sel-cohort').value; renderOptSection(); }
+function resetCohort(){
+  const cohorts = getSortedCohorts();
+  const latest = cohorts[cohorts.length-1] || 'All Cohorts';
+  state.cohortFilter = latest;
+  document.getElementById('sel-cohort').value = latest;
+  renderOptSection();
+  showToast('Reset to Current Cohort ('+latest+')');
+}
+
+function computeOptByCohort(){
+  return getSortedCohorts().map(c=>{
+    const rows = state.students.filter(s=>s.cohort===c);
+    const optYes = rows.filter(s=>isYes(s.optUsed)).length;
+    return {cohort:c, optYes, total:rows.length, pct: pct(optYes, rows.length)};
+  });
+}
+
+function renderOptSection(){
+  const seriesData = computeOptByCohort();
+  const ctx = document.getElementById('chart-opt');
+  if(state.charts.opt) state.charts.opt.destroy();
+  if(seriesData.every(d=>d.total===0)){ ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height); }
+  else{
+    state.charts.opt = new Chart(ctx,{
+      type:'line',
+      data:{ labels:seriesData.map(d=>d.cohort), datasets:[{ data:seriesData.map(d=>d.pct), borderColor:'#0d9488', backgroundColor:'rgba(13,148,136,.1)', fill:true, tension:.3, borderWidth:2.5, pointRadius:3 }]},
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{
+          label:(item)=>{ const d=seriesData[item.dataIndex]; return 'OPT Used: '+d.optYes+' / '+d.total+' students ('+d.pct+'%)'; }
+        }}},
+        scales:{ y:{min:0,max:100,grid:{color:'#f1f5f9'},ticks:{font:{size:8}}}, x:{grid:{display:false},ticks:{font:{size:8}}} }
+      }
+    });
+  }
+
+  // "— Yes"(데이터 없음)는 해당 코호트에 학생이 아예 0명일 때만 보여주고,
+  // 학생은 있는데 Yes가 0명인 경우엔 정상적으로 0%로 표시함 (없음과 0%는 다름)
+  const rows = byCohort(state.students, state.cohortFilter);
+  const optYesRows = rows.filter(s=>isYes(s.optUsed));
+  const optNo = rows.length - optYesRows.length;
+  const optPct = pct(optYesRows.length, rows.length);
+  document.getElementById('opt-yes-lbl').innerText = rows.length? optPct+'% Yes' : '— Yes';
+
+  const empBase = optYesRows; // Employment 도넛은 OPT 사용자 기준(디자인상 OPT 박스에서 파생)
+  const empYes = empBase.filter(s=>isYes(s.employment)).length;
+  const empPct = pct(empYes, empBase.length);
+  // rows.length(코호트 내 전체 학생 수) 기준으로 "데이터 없음" 여부를 판단 — empBase가 0이어도 rows가 있으면 0%로 표시
+  document.getElementById('emp-yes-lbl').innerText = rows.length? empPct+'% Yes' : '— Yes';
+
+  const ctxOptD = document.getElementById('chart-opt-donut');
+  if(state.charts.optDonut) state.charts.optDonut.destroy();
+  state.charts.optDonut = new Chart(ctxOptD,{ type:'doughnut',
+    data:{ labels:['Yes','No'], datasets:[{ data: rows.length? [optYesRows.length, optNo]:[1,1], backgroundColor:['#0d9488','#cbd5e1'], borderWidth:0 }]},
+    options:{ cutout:'65%', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(item)=> item.label+': '+ (rows.length? item.raw:0) +' students' } } } }
+  });
+
+  const ctxEmpD = document.getElementById('chart-emp-donut');
+  if(state.charts.empDonut) state.charts.empDonut.destroy();
+  const empDonutData = rows.length===0 ? [1,1] : (empBase.length===0 ? [0,1] : [empYes, empBase.length-empYes]);
+  state.charts.empDonut = new Chart(ctxEmpD,{ type:'doughnut',
+    data:{ labels:['Yes','No'], datasets:[{ data: empDonutData, backgroundColor:['#4f46e5','#cbd5e1'], borderWidth:0 }]},
+    options:{ cutout:'65%', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(item)=> item.label+': '+ (rows.length? item.raw:0) +' students (OPT-used base)' } } } }
+  });
+}
+
+function openOptModal(){
+  const rows = byCohort(state.students, state.cohortFilter).filter(s=>isYes(s.optUsed));
+  document.getElementById('modal-title').innerText = 'OPT Used Students ('+state.cohortFilter+')';
+  document.getElementById('modal-body').innerHTML = rows.length ? `<table class="mini"><thead><tr><th>UNID</th><th>Name</th><th>Cohort</th><th>Company</th><th>Employment</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${r.unid}</td><td>${r.name}</td><td>${r.cohort}</td><td>${r.company}</td><td>${r.employment}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty-state">No data</div>';
+  document.getElementById('modal').classList.add('show');
+}
+function openEmpModal(){
+  const rows = byCohort(state.students, state.cohortFilter).filter(s=>isYes(s.optUsed) && isYes(s.employment));
+  document.getElementById('modal-title').innerText = 'OPT→Employment Students ('+state.cohortFilter+')';
+  document.getElementById('modal-body').innerHTML = rows.length ? `<table class="mini"><thead><tr><th>UNID</th><th>Name</th><th>Company</th><th>Role</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr><td>${r.unid}</td><td>${r.name}</td><td>${r.company}</td><td>${r.role}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty-state">No data</div>';
+  document.getElementById('modal').classList.add('show');
+}
+
+/* ---- consultation ---- */
+function populateConsultSelects(){
+  const y = document.getElementById('sel-consult-year'), s = document.getElementById('sel-consult-season');
+  if(!y.innerHTML) y.innerHTML = ['2026','2025'].map(v=>`<option value="${v}">${v}</option>`).join('');
+  if(!s.innerHTML) s.innerHTML = ['Spring','Summer','Fall'].map(v=>`<option value="${v}">${v}</option>`).join('');
+}
+function updateConsultation(){
+  const y = document.getElementById('sel-consult-year').value;
+  const s = document.getElementById('sel-consult-season').value;
+  const key = y+'-'+s;
+  const val = CONSULT_MAP[key];
+  document.getElementById('consult-count').innerText = val ? val.toLocaleString()+' Sessions' : '—';
+}
+function renderGauge(){
+  const ctx = document.getElementById('chart-gauge');
+  if(state.charts.gauge) state.charts.gauge.destroy();
+  state.charts.gauge = new Chart(ctx,{ type:'doughnut',
+    data:{ labels:['Satisfaction','Remaining'], datasets:[{data:[98,2], backgroundColor:['#10b981','#e2e8f0'], borderWidth:0}]},
+    options:{ rotation:-90, circumference:180, cutout:'75%', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{enabled:false}} }
+  });
+}
+function renderFeedback(){
+  document.getElementById('feedback-text').innerText = FEEDBACKS[state.currentFeedbackIdx];
+  document.getElementById('feedback-dots').innerHTML = FEEDBACKS.map((_,i)=>`<span class="${i===state.currentFeedbackIdx?'on':''}"></span>`).join('');
+}
+function prevFeedback(){ state.currentFeedbackIdx=(state.currentFeedbackIdx-1+FEEDBACKS.length)%FEEDBACKS.length; renderFeedback(); }
+function nextFeedback(){ state.currentFeedbackIdx=(state.currentFeedbackIdx+1)%FEEDBACKS.length; renderFeedback(); }
+
+/* ---- events ---- */
+function getAllEventCards(){
+  return state.events.records.map(r=>({
+    ...r,
+    desc: state.events.desc[r.name] || null,
+    photo: state.events.photo[r.name] || null
+  }));
+}
+/* 년도 선택 시 그 연도의 이벤트만, 미선택(전체)이면 전부 — 목록/이전·다음/선택은 이 필터된 목록 기준으로 동작 */
+function getEventCards(){
+  const all = getAllEventCards();
+  if(!state.eventYearFilter) return all;
+  return all.filter(c=>String(c.year)===String(state.eventYearFilter));
+}
+function populateEventYearSelect(){
+  const sel = document.getElementById('event-year-select');
+  if(!sel) return;
+  const years = [...new Set(state.events.records.map(r=>r.year).filter(y=>y!==null && y!==undefined))].sort((a,b)=>a-b);
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  sel.value = years.map(String).includes(cur) ? cur : '';
+}
+function onEventYearChange(y){
+  state.eventYearFilter = y || null;
+  state.currentEventIdx = 0;
+  renderEventList();
+  renderCurrentEvent();
+}
+function renderEventList(){
+  const cards = getEventCards();
+  const totalPill = document.getElementById('event-count-pill');
+  if(totalPill) totalPill.innerText = 'TOTAL ' + state.events.records.length; // 누적 전체 이벤트 수(연도 필터와 무관하게 항상 표시)
+  const list = document.getElementById('event-list');
+  if(cards.length===0){ list.innerHTML = '<div class="empty-state">No events yet</div>'; return; }
+  list.innerHTML = cards.map((c,i)=>`<div class="event-item ${i===state.currentEventIdx?'on':''}" onclick="selectEvent(${i})">${c.name}<span style="float:right;color:var(--slate-400);font-weight:600;">${c.year??''}</span></div>`).join('');
+}
+function selectEvent(i){ state.currentEventIdx=i; renderEventList(); renderCurrentEvent(); }
+function prevEvent(){ const n=getEventCards().length; if(!n)return; state.currentEventIdx=(state.currentEventIdx-1+n)%n; renderEventList(); renderCurrentEvent(); }
+function nextEvent(){ const n=getEventCards().length; if(!n)return; state.currentEventIdx=(state.currentEventIdx+1)%n; renderEventList(); renderCurrentEvent(); }
+function renderCurrentEvent(){
+  const cards = getEventCards();
+  const c = cards[state.currentEventIdx];
+  const frame = document.getElementById('event-photo-frame');
+  if(!c){
+    document.getElementById('event-title').innerText='—'; document.getElementById('event-date').innerText='—';
+    document.getElementById('event-attend').innerText='—'; document.getElementById('event-desc').innerText='No events registered.';
+    frame.innerHTML = '<div class="photo-frame blank" style="width:100%;height:100%;">No Photo</div>';
+    renderEventInfoChart(null);
+    return;
+  }
+  document.getElementById('event-title').innerText = c.name;
+  document.getElementById('event-date').innerText = c.date ?? '—';
+  document.getElementById('event-attend').innerText = (c.actualAttendees ?? c.count ?? 0) + ' Students';
+  document.getElementById('event-desc').innerText = c.desc ? ('"'+c.desc+'"') : 'No description file (blank)';
+  if(c.photo) frame.innerHTML = `<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;">`;
+  else frame.innerHTML = '<div class="photo-frame blank" style="width:100%;height:100%;">No photo (filename not matched)</div>';
+  renderEventInfoChart(c);
+}
+/* 이전: 카테고리×연도 누적 막대그래프 → 변경: 선택한 이벤트 하나의 RSVP 대비 실참여 전환율 도넛 + 숫자 스탯 */
+function renderEventInfoChart(c){
+  const ctx = document.getElementById('chart-event-info');
+  const statsEl = document.getElementById('event-rsvp-stats');
+  if(state.charts.eventInfo) state.charts.eventInfo.destroy();
+  if(!c){
+    ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
+    if(statsEl) statsEl.innerHTML = '';
+    return;
+  }
+  const rsvp = c.rsvpTotal || 0;
+  const actual = c.actualAttendees || 0;
+  const rate = c.attendanceRate ?? (rsvp ? Math.round((actual/rsvp)*1000)/10 : 0);
+  const noShow = Math.max(rsvp - actual, 0);
+  state.charts.eventInfo = new Chart(ctx,{ type:'doughnut',
+    data:{ labels:['Attended','Noshow'], datasets:[{ data: rsvp>0 ? [actual, noShow] : [0,1], backgroundColor:['#2563eb','#e2e8f0'], borderWidth:0 }] },
+    options:{ cutout:'68%', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,usePointStyle:true,pointStyle:'circle',font:{size:9,weight:'bold'},padding:8}},
+        tooltip:{ callbacks:{ label:(item)=> item.label+': '+item.raw } } }
+    }
+  });
+  if(statsEl){
+    statsEl.innerHTML = `
+      <div><div style="font-size:14px;font-weight:900;color:var(--slate-800);">${rsvp}</div><div>RSVP</div></div>
+      <div><div style="font-size:14px;font-weight:900;color:var(--slate-800);">${actual}</div><div>Attended</div></div>
+      <div><div style="font-size:14px;font-weight:900;color:var(--blue);">${rate}%</div><div>Conversion Rate</div></div>`;
+  }
+}
+
+/* ============ EXCEL LIST TAB ============ */
+function showToast(msg){
+  const t = document.getElementById('excel-toast');
+  t.querySelector('span').innerText = '✓ ' + msg;
+  t.style.display='flex';
+  setTimeout(()=>t.style.display='none', 3000);
+}
+
+/* 헤더 행에 이름 없는 잔여 열(엑셀 서식이 밀려 생기는 빈 컬럼 등)이 있으면 아예 무시 — 인덱스는 원본 위치로 추적 */
+function parseCSVHeaderMap(text){
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const raw = firstLine.split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+  const headers = []; const colIdxs = [];
+  raw.forEach((h,i)=>{ if(h!==''){ headers.push(h); colIdxs.push(i); } });
+  return { headers, colIdxs };
+}
+function parseCSVHeaders(text){ return parseCSVHeaderMap(text).headers; }
+function parseCSVRows(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim().length);
+  if(lines.length<2) return [];
+  const { headers, colIdxs } = parseCSVHeaderMap(text);
+  return lines.slice(1).map(line=>{
+    const cells = line.split(',');
+    const obj={};
+    headers.forEach((h,hi)=>{ const raw=(cells[colIdxs[hi]]||'').trim(); obj[h] = raw==='' ? null : raw; });
+    return obj;
+  });
+}
+
+/* 컬럼명 뒤에 "(Full-time / Internship)" 같은 부가 설명이 붙어 있어도 같은 컬럼으로 인식하기 위한 정규화 */
+function normalizeHeader(h){
+  return String(h||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+/* 필수 컬럼이 다 있는지 + 스키마에 없는 낯선 컬럼(예: 갑자기 등장한 "Age")이 섞여있는지 검사.
+   빈 셀 값 자체는 오류가 아님 — 컬럼 구조만 검사함.
+   optional은 있으면 인식하지만 없어도 오류로 잡지 않는 컬럼(예: Note). */
+function validateHeaders(headers, required, optional){
+  optional = optional || [];
+  const normReq = required.map(normalizeHeader);
+  const normOpt = optional.map(normalizeHeader);
+  const map = {};
+  const missing = [];
+  required.forEach((r,i)=>{
+    const found = headers.find(h=>{ const n=normalizeHeader(h); return n===normReq[i] || n.startsWith(normReq[i]+' ') || normReq[i].startsWith(n+' '); });
+    if(found) map[r] = found; else missing.push(r);
+  });
+  optional.forEach((r,i)=>{
+    const found = headers.find(h=>{ const n=normalizeHeader(h); return n===normOpt[i] || n.startsWith(normOpt[i]+' ') || normOpt[i].startsWith(n+' '); });
+    if(found) map[r] = found;
+  });
+  const allNorm = normReq.concat(normOpt);
+  const extra = headers.filter(h=>{
+    const n = normalizeHeader(h);
+    return !allNorm.some(nr=> n===nr || n.startsWith(nr+' ') || nr.startsWith(n+' '));
+  });
+  return { missing, extra, map };
+}
+
+/* ---- 순수 JS ZIP + XML 기반 .xlsx 리더 (외부 라이브러리 없이 브라우저 내장 DecompressionStream/DOMParser만 사용) ---- */
+function colLettersToIndex(letters){
+  let n = 0;
+  for(let i=0;i<letters.length;i++) n = n*26 + (letters.charCodeAt(i) - 64);
+  return n - 1;
+}
+
+async function parseXLSXFile(file){
+  if(typeof DecompressionStream === 'undefined'){
+    throw new Error('이 브라우저는 xlsx 압축 해제를 지원하지 않습니다');
+  }
+  const buf = new Uint8Array(await file.arrayBuffer());
+  const dv = new DataView(buf.buffer);
+
+  let eocd = -1;
+  const searchStart = Math.max(0, buf.length - 22 - 65557);
+  for(let i = buf.length - 22; i >= searchStart; i--){
+    if(buf[i]===0x50 && buf[i+1]===0x4b && buf[i+2]===0x05 && buf[i+3]===0x06){ eocd = i; break; }
+  }
+  if(eocd < 0) throw new Error('유효한 xlsx(zip) 파일이 아닙니다');
+
+  const totalEntries = dv.getUint16(eocd+10, true);
+  let ptr = dv.getUint32(eocd+16, true);
+  const entries = {};
+  for(let i=0;i<totalEntries;i++){
+    if(dv.getUint32(ptr, true) !== 0x02014b50) break;
+    const compMethod = dv.getUint16(ptr+10, true);
+    const compSize = dv.getUint32(ptr+20, true);
+    const nameLen = dv.getUint16(ptr+28, true);
+    const extraLen = dv.getUint16(ptr+30, true);
+    const commentLen = dv.getUint16(ptr+32, true);
+    const localOffset = dv.getUint32(ptr+42, true);
+    const name = new TextDecoder().decode(buf.slice(ptr+46, ptr+46+nameLen));
+    entries[name] = { compMethod, compSize, localOffset };
+    ptr += 46 + nameLen + extraLen + commentLen;
+  }
+
+  async function readEntry(name){
+    const e = entries[name];
+    if(!e) return null;
+    const lp = e.localOffset;
+    if(dv.getUint32(lp, true) !== 0x04034b50) throw new Error('손상된 zip 항목: '+name);
+    const lNameLen = dv.getUint16(lp+26, true);
+    const lExtraLen = dv.getUint16(lp+28, true);
+    const dataStart = lp + 30 + lNameLen + lExtraLen;
+    const compData = buf.slice(dataStart, dataStart + e.compSize);
+    let raw;
+    if(e.compMethod === 0) raw = compData;
+    else if(e.compMethod === 8){
+      const stream = new Blob([compData]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      raw = new Uint8Array(await new Response(stream).arrayBuffer());
+    } else throw new Error('지원하지 않는 압축 방식');
+    return new TextDecoder('utf-8').decode(raw);
+  }
+
+  let sheetPath = entries['xl/worksheets/sheet1.xml'] ? 'xl/worksheets/sheet1.xml'
+    : Object.keys(entries).find(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n));
+  if(!sheetPath) throw new Error('워크시트를 찾을 수 없습니다');
+
+  const [sheetXml, sstXml] = await Promise.all([readEntry(sheetPath), readEntry('xl/sharedStrings.xml')]);
+  const parser = new DOMParser();
+  let sst = [];
+  if(sstXml){
+    const sstDoc = parser.parseFromString(sstXml, 'application/xml');
+    sst = Array.from(sstDoc.getElementsByTagName('si')).map(si => Array.from(si.getElementsByTagName('t')).map(t=>t.textContent).join(''));
+  }
+  const sheetDoc = parser.parseFromString(sheetXml, 'application/xml');
+  const rowEls = Array.from(sheetDoc.getElementsByTagName('row'));
+
+  const grid = rowEls.map(rowEl=>{
+    const arr = [];
+    Array.from(rowEl.getElementsByTagName('c')).forEach(c=>{
+      const ref = c.getAttribute('r') || '';
+      const letters = (ref.match(/^[A-Z]+/) || ['A'])[0];
+      const idx = colLettersToIndex(letters);
+      const type = c.getAttribute('t');
+      let val = '';
+      if(type === 'inlineStr'){
+        const isEl = c.getElementsByTagName('is')[0];
+        val = isEl ? Array.from(isEl.getElementsByTagName('t')).map(t=>t.textContent).join('') : '';
+      } else {
+        const vEl = c.getElementsByTagName('v')[0];
+        const rawVal = vEl ? vEl.textContent : '';
+        val = (type === 's') ? (sst[parseInt(rawVal,10)] ?? '') : rawVal;
+      }
+      arr[idx] = val;
+    });
+    return arr;
+  });
+
+  if(grid.length < 1) return [];
+  // 헤더가 비어있는 열(엑셀 서식이 밀려 생기는 이름 없는 잔여 열 등)은 컬럼 자체를 무시 — "예상치 못한 컬럼" 오탐 방지
+  const headerRow = grid[0] || [];
+  const headers = []; const colIdxs = [];
+  headerRow.forEach((h,i)=>{ if(h!==undefined && String(h).trim()!==''){ headers.push(String(h).trim()); colIdxs.push(i); } });
+  return grid.slice(1)
+    .filter(r=>r && colIdxs.some(i=>r[i]!==undefined && r[i]!==''))
+    .map(r=>{ const obj={}; headers.forEach((h,hi)=>{ const v=r[colIdxs[hi]]; obj[h] = (v===undefined || v==='') ? null : v; }); return obj; });
+}
+
+async function handleSheetUpload(evt, slot){
+  const file = evt.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  const fileId = nextFileId();
+  const isCSV = file.name.toLowerCase().endsWith('.csv');
+  const required = (slot==='EventRecords') ? REQUIRED_COLS_EVENT : (slot==='EventDesc') ? REQUIRED_COLS_DESC : REQUIRED_COLS;
+  const optional = (slot==='Placement') ? OPTIONAL_COLS_PLACEMENT : (slot==='EventRecords') ? OPTIONAL_COLS_EVENT : [];
+
+  try {
+    let rows, headers;
+    if(isCSV){
+      const text = await file.text();
+      headers = parseCSVHeaders(text);
+      rows = parseCSVRows(text);
+    } else {
+      rows = await parseXLSXFile(file);
+      if(rows.length===0) throw new Error('빈 시트이거나 헤더를 읽을 수 없습니다');
+      headers = Object.keys(rows[0]);
+    }
+    const { missing, extra, map } = validateHeaders(headers, required, optional);
+    if(missing.length || extra.length){
+      const parts = [];
+      if(missing.length) parts.push('누락된 컬럼: '+missing.join(', '));
+      if(extra.length) parts.push('예상치 못한 컬럼: '+extra.join(', '));
+      state.uploadedFiles[slot].push({id:fileId, name:file.name, status:'err', note:parts.join(' / '), url});
+      afterUpload(slot); evt.target.value=''; return;
+    }
+    state.uploadedFiles[slot].push({id:fileId, name:file.name, status:'ok', rows, url});
+    applyParsedRows(slot, rows, map, fileId);
+  } catch(err){
+    state.uploadedFiles[slot].push({id:fileId, name:file.name, status:'err', note:'파일을 읽지 못했습니다 — '+err.message+' (CSV로 저장 후 업로드하면 확실히 동작합니다)', url});
+  }
+  afterUpload(slot);
+  evt.target.value = '';
+}
+
+/* 값이 없으면(빈칸) null — 대시보드 집계 로직에서 "값 없음"을 명확히 구분해 블랭크 처리하기 위함 */
+function nz(v){ return (v===undefined || v==='' || v===null) ? null : v; }
+
+/* Attendance Rate 값이 "85%"/"85"(백분율) 또는 "0.85"(소수)로 들어와도 같은 의미로 정규화. 값이 없으면 RSVP/실참여로 계산 */
+function normalizeAttendanceRate(raw, rsvp, actual){
+  if(raw!==null && raw!==undefined && String(raw).trim()!==''){
+    const n = Number(String(raw).replace('%','').trim());
+    if(!isNaN(n)) return n<=1 ? Math.round(n*1000)/10 : Math.round(n*10)/10;
+  }
+  if(rsvp) return Math.round((actual/rsvp)*1000)/10;
+  return null;
+}
+function applyParsedRows(slot, rows, map, fileId){
+  if(slot==='Placement'){
+    const mapped = rows.map(r=>({
+      cohort:nz(r[map['Cohort']]), unid:nz(r[map['UNID']]), name:nz(r[map['Student Name']]), major:nz(r[map['Major']]),
+      adminYear:nz(r[map['Admin Year']]), type:nz(r[map['Type']]), company:nz(r[map['Company']]), role:nz(r[map['Role']]),
+      optUsed:nz(r[map['OPT-USED']]), employment:nz(r[map['Employment']]), note:nz(r[map['Note']]), _fileId:fileId, _uid:nextStudentUid()
+    }));
+    state.students = state.students.concat(mapped);
+  } else if(slot==='EventRecords'){
+    /* 이벤트 데이터는 이제 이벤트 하나당 한 행(이미 집계된 형태) — 학생별 그룹핑 불필요 */
+    const mapped = rows.map(r=>{
+      const name = nz(r[map['Event Name']]);
+      const rsvpTotal = Number(nz(r[map['RSVP Total']])) || 0;
+      const actualAttendees = Number(nz(r[map['Actual Attendees']])) || 0;
+      const attendanceRate = normalizeAttendanceRate(r[map['Attendance Rate']], rsvpTotal, actualAttendees);
+      return {
+        name, type:nz(r[map['Event Type']]), year:Number(r[map['Year']])||null, date:nz(r[map['Date']]),
+        rsvpTotal, actualAttendees, attendanceRate, note:nz(r[map['Note']]),
+        count: actualAttendees, // 기존 코드(요약 뱃지 등)와의 호환을 위해 실참여수를 count로도 노출
+        _fileId:fileId
+      };
+    }).filter(e=>e.name!==null);
+    state.events.records = state.events.records.concat(mapped);
+  } else if(slot==='EventDesc'){
+    rows.forEach(r=>{
+      const key=nz(r[map['Event Name']]);
+      if(key!==null){ state.events.desc[key] = nz(r[map['Description']]); state.events.descSourceFile[key] = fileId; }
+    });
+  }
+}
+
+function handlePhotoUpload(evt){
+  const files = Array.from(evt.target.files || []);
+  files.forEach(f=>{
+    const nameNoExt = f.name.replace(/\.[^.]+$/,'');
+    const url = URL.createObjectURL(f);
+    const fileId = nextFileId();
+    state.events.photo[nameNoExt] = url;
+    state.uploadedFiles.EventPhoto.push({id:fileId, name:f.name, status:'ok', note:'매칭 대상: "'+nameNoExt+'"', url, photoKey:nameNoExt});
+  });
+  afterUpload('EventPhoto');
+}
+
+function afterUpload(slot){
+  renderFileTags(slot);
+  updateSlotCounts();
+  renderDashboard();
+  renderTable();
+  buildFilterTags();
+  refreshCasingWarning();
+  showToast(slot+' 파일이 반영되었습니다.');
+}
+
+/* 파일을 빼면(삭제하면) 그 파일에서 들어온 데이터도 함께 사라지는 방식 */
+function removeFile(slot, idx){
+  const entry = state.uploadedFiles[slot][idx];
+  if(entry){
+    if(slot==='Placement') state.students = state.students.filter(s=>s._fileId !== entry.id);
+    else if(slot==='EventRecords') state.events.records = state.events.records.filter(r=>r._fileId !== entry.id);
+    else if(slot==='EventDesc'){
+      Object.keys(state.events.descSourceFile).forEach(name=>{
+        if(state.events.descSourceFile[name] === entry.id){ delete state.events.desc[name]; delete state.events.descSourceFile[name]; }
+      });
+    } else if(slot==='EventPhoto' && entry.photoKey){
+      delete state.events.photo[entry.photoKey];
+    }
+  }
+  state.uploadedFiles[slot].splice(idx,1);
+  afterUpload(slot);
+  showToast('파일과 관련 데이터가 삭제되었습니다.');
+}
+
+function renderFileTags(slot){
+  const el = document.getElementById('tags-'+slot);
+  if(!el) return;
+  const files = state.uploadedFiles[slot];
+  el.innerHTML = files.map((f,i)=>{
+    const nameHtml = f.url
+      ? `<a href="${f.url}" target="_blank" rel="noopener" download="${f.name}" title="원본 파일 열기" style="color:inherit;text-decoration:underline dotted;">${f.name}</a>`
+      : f.name;
+    return `<span class="file-tag ${f.status}">${nameHtml}<button onclick="removeFile('${slot}',${i})" title="파일 및 데이터 삭제">🗑</button></span>`;
+  }).join('')
+    + files.filter(f=>f.status==='err').map(f=>`<div class="err-msg">${f.name}: ${f.note}</div>`).join('');
+}
+
+function updateSlotCounts(){
+  const optCount = state.students.filter(s=>isYes(s.optUsed)).length;
+  document.getElementById('count-Placement').innerText = state.students.length + ' rows · OPT ' + optCount;
+  document.getElementById('count-Event').innerText = state.events.records.length + ' events';
+}
+
+function buildFilterTags(){
+  const years = ['2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+  const seasons = ['Spring','Summer','Fall','Winter'];
+  const sheets = ['Placement','Consultation','Event'];
+  document.getElementById('filter-year').innerHTML = years.map(y=>`<button class="tag-btn ${state.yearFilter.has(y)?'on':''}" onclick="toggleFilter('year','${y}')">${y}</button>`).join('');
+  document.getElementById('filter-season').innerHTML = seasons.map(s=>`<button class="tag-btn ${state.seasonFilter.has(s)?'on':''}" onclick="toggleFilter('season','${s}')">${s}</button>`).join('');
+  document.getElementById('filter-sheet').innerHTML = sheets.map(s=>`<button class="tag-btn ${state.sheetFilter===s?'on':''}" onclick="setSheetFilter('${s}')">${s}</button>`).join('');
+}
+function toggleFilter(kind, val){
+  const set = kind==='year'?state.yearFilter:state.seasonFilter;
+  set.has(val) ? set.delete(val) : set.add(val);
+  buildFilterTags();
+  renderTable();
+}
+
+/* 시트별 고정 컬럼 정의 — 데이터가 0건이어도 이 헤더는 항상 노출됨 */
+const SHEET_COLUMNS = {
+  Placement: [
+    {header:'Cohort',key:'cohort'},{header:'UNID',key:'unid'},{header:'Student Name',key:'name'},
+    {header:'Major',key:'major'},{header:'Admin Year',key:'adminYear'},{header:'Type',key:'type'},
+    {header:'Company',key:'company'},{header:'Role',key:'role'},{header:'OPT-USED',key:'optUsed'},{header:'Employment',key:'employment'},
+    {header:'Note',key:'note'}
+  ],
+  Event: [
+    {header:'Year',key:'year'},{header:'Date',key:'date'},{header:'Event Name',key:'name'},{header:'Event Type',key:'type'},
+    {header:'RSVP Total',key:'rsvpTotal'},{header:'Actual Attendees',key:'actualAttendees'},
+    {header:'Attendance Rate',key:'attendanceRate',fmt:v=> (v===null||v===undefined||v==='') ? '' : v+'%'},
+    {header:'Note',key:'note'}
+  ],
+  Consultation: [] // 스키마 미정 — 8-4 사양에 따라 현재 비워둠
+};
+
+function getFilteredData(){
+  let data;
+  // Event는 desc/photo가 합쳐지지 않은 원본 레코드를 그대로 써야 편집 시 state.events.records에 직접 반영됨(참조 공유)
+  if(state.sheetFilter==='Placement') data = state.students;
+  else if(state.sheetFilter==='Event') data = state.events.records;
+  else data = []; // Consultation intentionally empty — sheet not wired up yet
+
+  if(state.sheetFilter==='Placement'){
+    if(state.yearFilter.size) data = data.filter(s=>[...state.yearFilter].some(y=>s.cohort && s.cohort.includes(y)));
+    if(state.seasonFilter.size) data = data.filter(s=>[...state.seasonFilter].some(se=>s.cohort && s.cohort.includes(se)));
+  } else if(state.sheetFilter==='Event'){
+    if(state.yearFilter.size) data = data.filter(c=>[...state.yearFilter].some(y=>String(c.year)===y));
+  }
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  if(q){
+    data = data.filter(row => Object.values(row).some(v=>String(v).toLowerCase().includes(q)));
+  }
+  return data;
+}
+
+function renderTable(){
+  const data = getFilteredData();
+  const cols = SHEET_COLUMNS[state.sheetFilter] || [];
+  const head = document.getElementById('table-head'), body = document.getElementById('table-body'), info = document.getElementById('table-info');
+  const editable = cols.length > 0; // Consultation은 스키마가 없어 편집 불가
+  document.getElementById('edit-btn').style.display = (!state.editMode && editable) ? 'inline-flex' : 'none';
+
+  if(cols.length===0){
+    // Consultation: 스키마 자체가 아직 없음
+    head.innerHTML = '';
+    body.innerHTML = '<tr><td class="empty-state">Consultation Sheet는 현재 비워둔 상태입니다 (8-4 사양 — 추후 연동).</td></tr>';
+    info.innerText = 'Consultation Sheet — 0 records';
+    return;
+  }
+
+  // 헤더는 데이터가 0건이어도 항상 고정 스키마대로 표시
+  head.innerHTML = '<tr>'+cols.map(c=>`<th>${c.header}</th>`).join('')+'</tr>';
+
+  if(data.length===0){
+    body.innerHTML = `<tr><td colspan="${cols.length}" class="empty-state">${state.sheetFilter} Sheet — 업로드된 데이터가 없습니다 (컬럼 형식만 표시 중).</td></tr>`;
+    info.innerText = state.sheetFilter+' Sheet — 0 records';
+    return;
+  }
+
+  if(state.editMode){
+    body.innerHTML = data.map(row=>'<tr>'+cols.map(c=>{
+      const v = (row[c.key] ?? '').toString().replace(/"/g,'&quot;');
+      return `<td><input type="text" data-key="${c.key}" value="${v}"></td>`;
+    }).join('')+'</tr>').join('');
+  } else {
+    body.innerHTML = data.map(row=>'<tr>'+cols.map(c=>`<td>${c.fmt ? c.fmt(row[c.key]) : (row[c.key] ?? '')}</td>`).join('')+'</tr>').join('');
+  }
+  info.innerText = state.sheetFilter+' Sheet — '+data.length+' records';
+}
+
+function toggleEditLock(locked){
+  document.querySelector('.filter-block')?.classList.toggle('locked', locked);
+  document.querySelector('.search-bar')?.classList.toggle('locked', locked);
+}
+
+function enterEditMode(){
+  const cols = SHEET_COLUMNS[state.sheetFilter] || [];
+  if(cols.length===0){ showToast('이 시트는 아직 편집할 수 없습니다.'); return; }
+  state.editMode = true;
+  document.getElementById('edit-btn').style.display='none';
+  document.getElementById('save-btn').style.display='inline-flex';
+  document.getElementById('cancel-btn').style.display='inline-flex';
+  toggleEditLock(true);
+  renderTable();
+}
+
+function cancelEdits(){
+  state.editMode = false;
+  document.getElementById('save-btn').style.display='none';
+  document.getElementById('cancel-btn').style.display='none';
+  toggleEditLock(false);
+  renderTable();
+}
+
+function saveEdits(){
+  const rows = getFilteredData();
+  const cols = SHEET_COLUMNS[state.sheetFilter] || [];
+  const numericKeys = new Set(['year','count','adminYear','rsvpTotal','actualAttendees','attendanceRate']);
+  document.querySelectorAll('#table-body tr').forEach((tr, ridx)=>{
+    const row = rows[ridx];
+    if(!row) return;
+    cols.forEach(c=>{
+      const inp = tr.querySelector(`input[data-key="${c.key}"]`);
+      if(!inp) return;
+      let v = inp.value;
+      if(numericKeys.has(c.key) && v !== '' && !isNaN(Number(v))) v = Number(v);
+      row[c.key] = v;
+    });
+  });
+  state.editMode = false;
+  document.getElementById('save-btn').style.display='none';
+  document.getElementById('cancel-btn').style.display='none';
+  toggleEditLock(false);
+  renderTable();
+  updateSlotCounts();
+  renderDashboard();
+  refreshCasingWarning();
+  showToast('수정사항이 저장되어 대시보드에 반영되었습니다.');
+}
+
+function renderExcelTab(){
+  ['Placement','EventRecords','EventDesc','EventPhoto'].forEach(renderFileTags);
+  updateSlotCounts();
+  buildFilterTags();
+  refreshCasingWarning();
+  renderTable();
+}
+
+/* ============ INIT ============ */
+switchTab('dash');
+</script>
+</body>
+</html>
