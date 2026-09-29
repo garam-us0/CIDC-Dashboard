@@ -4,12 +4,14 @@ function handleFileUpload(evt) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const isConsultation = window.dbState.activeExcelSheet === 'Consultation';
+        // 상담 시트는 날짜 셀을 Date로 읽어 'YYYY-MM-DD'로 정규화
+        const workbook = XLSX.read(data, { type: 'array', cellDates: isConsultation });
         const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
         if (json.length > 0) {
             if (window.dbState.activeExcelSheet === 'Placement') window.dbState.placementData = json;
             else if (window.dbState.activeExcelSheet === 'OPT') window.dbState.optData = json;
-            else if (window.dbState.activeExcelSheet === 'Consultation') window.dbState.consultationData = json;
+            else if (isConsultation) window.dbState.consultationData = normalizeConsultationData(json);
             else if (window.dbState.activeExcelSheet === 'Event') window.dbState.eventData = json;
             
             window.saveStateToStorage();
@@ -20,6 +22,7 @@ function handleFileUpload(evt) {
         }
     };
     reader.readAsArrayBuffer(file);
+    evt.target.value = ''; // 같은 파일을 수정 후 다시 올려도 인식되도록
 }
 
 function renderExcelTable() {
@@ -30,7 +33,7 @@ function renderExcelTable() {
     if (!head || !body || !info) return;
 
     if (data.length === 0) {
-        head.innerHTML = '<tr><th class="p-3">No Records Available</th></tr>';
+        head.innerHTML = `<tr><th class="p-3">No Records Available</th></tr>`;
         body.innerHTML = '';
         info.innerText = '0 Records';
         return;
@@ -74,6 +77,7 @@ function switchExcelSheet(sheetName) {
         const btn = document.getElementById(`sheet-btn-${s}`);
         if (btn) btn.className = s === sheetName ? 'px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-blue-600 text-white shadow-sm' : 'px-4 py-1.5 rounded-lg font-extrabold text-[10px] bg-slate-100 text-slate-700 hover:bg-slate-200';
     });
+    document.getElementById('consult-tools')?.classList.toggle('hidden', sheetName !== 'Consultation');
     renderExcelTable();
 }
 

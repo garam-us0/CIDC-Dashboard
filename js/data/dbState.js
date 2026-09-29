@@ -1,7 +1,6 @@
 const defaultState = {
     activeExcelSheet: 'Placement',
     currentEventIdx: 0,
-    currentFeedbackIdx: 0,
     placementData: [
         { id: 'STU-101', studentName: 'Alex Johnson', cohort: 'Spring 2024', major: 'Computer Science', company: 'Apple', role: 'Software Engineer', status: 'Employed' },
         { id: 'STU-102', studentName: 'Sarah Smith', cohort: 'Fall 2023', major: 'Data Science', company: 'Google', role: 'Data Analyst', status: 'Employed' },
@@ -11,8 +10,14 @@ const defaultState = {
     optData: [
         { studentId: 'STU-101', name: 'Alex Johnson', optType: 'STEM 24-Mo', status: 'Approved', startDate: '2024-06-01', employer: 'Apple' }
     ],
+    // Sample data — replaced when real records are uploaded in Excel List > Consultation Sheet
     consultationData: [
-        { sessionDate: '2026-03-15', student: 'Alex Johnson', counselor: 'Dr. Robert Carter', topic: 'OPT Legal Filing & Resume Review', rating: 5 }
+        { sessionDate: '2026-03-15', student: 'Alex Johnson', counselor: 'Dr. Robert Carter', topic: 'OPT Legal Filing & Resume Review', rating: 5, review: 'The OPT legal seminar clarified all my F1 visa questions and streamlined my EAD application.' },
+        { sessionDate: '2026-03-02', student: 'Minji Kim', counselor: 'Soohyun Lee', topic: 'Mock Interview & Tech Screen Prep', rating: 5, review: '10/10 mock interview sessions. I felt fully prepared for the tech screen at Apple.' },
+        { sessionDate: '2026-02-18', student: 'Sarah Smith', counselor: 'Dr. Robert Carter', topic: 'Career Fair Preparation', rating: 4, review: 'The career fair prep session was directly responsible for my full-time offer.' },
+        { sessionDate: '2026-01-27', student: 'Junho Park', counselor: 'Soohyun Lee', topic: 'Resume Review', rating: 4, review: 'My resume is much cleaner now and I am getting more interview calls.' },
+        { sessionDate: '2025-10-08', student: 'Emily Davis', counselor: 'Jane Park', topic: 'Networking Strategy', rating: 5, review: 'Practical advice on reaching out to alumni on LinkedIn.' },
+        { sessionDate: '2025-07-14', student: 'Yuna Choi', counselor: 'Jane Park', topic: 'STEM OPT Extension', rating: 3, review: '' }
     ],
     eventData: [
         { title: 'OPT Workshop & Legal Seminar', date: '2026-02-15', attendance: 220, photo: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=1000&auto=format&fit=crop&q=80', desc: 'Comprehensive visa & STEM OPT guidance with certified immigration attorneys.' },
@@ -20,11 +25,6 @@ const defaultState = {
         { title: 'Tech Alumni Networking Night', date: '2026-02-28', attendance: 180, photo: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=1000&auto=format&fit=crop&q=80', desc: 'Direct 1-on-1 mentorship with senior engineers from Silicon Valley.' },
         { title: 'Resume & Portfolio Review Blitz', date: '2026-01-20', attendance: 310, photo: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1000&auto=format&fit=crop&q=80', desc: 'Personalized feedback sessions with top corporate recruiters.' }
     ],
-    feedbackList: [
-        '"The Career Fair organized by CIDC was directly responsible for my full-time offer at Microsoft!"',
-        '"10/10 mock interview sessions. I felt 100% prepared for tech screen questions at Apple!"',
-        '"The OPT legal seminar clarified all my F1 visa questions and streamlined my EAD application."'
-    ]
 };
 
 // 페이지 이동 시 데이터 증발을 막기 위한 로컬스토리지 로딩

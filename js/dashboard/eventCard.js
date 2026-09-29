@@ -26,16 +26,3 @@ function renderCurrentEvent() {
     }
 }
 
-function updateFeedbackDisplay() {
-    const container = document.getElementById('feedback-text-container');
-    const dots = document.getElementById('feedback-dots');
-    if (container) container.innerText = window.dbState.feedbackList[window.dbState.currentFeedbackIdx];
-    if (dots) {
-        dots.innerHTML = window.dbState.feedbackList.map((_, i) =>
-            `<span class="w-2 h-2 rounded-full ${i === window.dbState.currentFeedbackIdx ? 'bg-blue-600' : 'bg-slate-300'}"></span>`
-        ).join('');
-    }
-}
-
-function prevFeedback() { window.dbState.currentFeedbackIdx = (window.dbState.currentFeedbackIdx - 1 + window.dbState.feedbackList.length) % window.dbState.feedbackList.length; updateFeedbackDisplay(); }
-function nextFeedback() { window.dbState.currentFeedbackIdx = (window.dbState.currentFeedbackIdx + 1) % window.dbState.feedbackList.length; updateFeedbackDisplay(); }
